@@ -5,6 +5,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -248,7 +249,6 @@ fun EventScreen(
                     // Check if the user is logged in
                     val currentUser = auth.currentUser
                     if (currentUser == null) {
-                        // Show a Toast message if not logged in
                         Toast.makeText(context, "You must be logged in to save the event.", Toast.LENGTH_SHORT).show()
                     } else {
                         saveEventToFirestore(
@@ -258,6 +258,7 @@ fun EventScreen(
                             time = time,
                             location = location,
                             imageUri = imageUri,
+                            userProfileUrl = currentUser.photoUrl?.toString(), // Get user's profile URL
                             onComplete = { success, errorMessage ->
                                 if (success) {
                                     saveError = null
@@ -316,6 +317,7 @@ fun saveEventToFirestore(
     time: String,
     location: String,
     imageUri: Uri?,
+    userProfileUrl: String?,
     onComplete: (Boolean, String?) -> Unit
 ) {
     val firestore = FirebaseFirestore.getInstance()
@@ -324,27 +326,32 @@ fun saveEventToFirestore(
     // Create a unique ID for the event
     val eventId = UUID.randomUUID().toString()
 
+    val eventData = mutableMapOf(
+        "id" to eventId,
+        "title" to title,
+        "description" to description,
+        "date" to date,
+        "time" to time,
+        "location" to location
+    )
+
     if (imageUri != null) {
         // Upload the image to Firebase Storage
         val storageRef = storage.reference.child("events/$eventId.jpg")
         storageRef.putFile(imageUri)
             .addOnSuccessListener { taskSnapshot ->
                 storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                    // Save event data with the image URL
-                    val eventData = mapOf(
-                        "title" to title,
-                        "description" to description,
-                        "date" to date, // Store date as string
-                        "time" to time, // Store time as string
-                        "location" to location,
-                        "photoUrl" to downloadUri.toString()
-                    )
+                    eventData["photoUrl"] = downloadUri.toString()
+                    eventData["userProfileUrl"] = userProfileUrl ?: "" // Add user's profile URL
+
                     firestore.collection("events").document(eventId)
                         .set(eventData)
                         .addOnSuccessListener {
+                            Log.d("Firestore", "Event saved with ID: $eventId")
                             onComplete(true, null)
                         }
                         .addOnFailureListener { e ->
+                            Log.e("Firestore", "Failed to save event: ${e.message}")
                             onComplete(false, e.message)
                         }
                 }
@@ -353,14 +360,7 @@ fun saveEventToFirestore(
                 onComplete(false, e.message)
             }
     } else {
-        // Save event data without an image
-        val eventData = mapOf(
-            "title" to title,
-            "description" to description,
-            "date" to date,
-            "time" to time,
-            "location" to location
-        )
+        eventData["userProfileUrl"] = userProfileUrl ?: "" // Add user's profile URL even if no event image
         firestore.collection("events").document(eventId)
             .set(eventData)
             .addOnSuccessListener {

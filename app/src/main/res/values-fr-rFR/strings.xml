@@ -10,5 +10,7 @@
     <string name="create_event_label">Création d\'un événement</string>
     <string name="contentDescription_go_back">Retournez</string>
     <string name="action_valider">Valider</string>
+    <string name="description_button_add">Ajouter</string>
+
 
 </resources>

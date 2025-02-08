@@ -28,12 +28,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.eventorias.presentation.ProfileScreen
+import com.example.eventorias.presentation.event.EventListScreen
 import com.example.eventorias.presentation.event.EventScreen
 import com.example.eventorias.presentation.sign_in.EmailAuthClient
 import com.example.eventorias.presentation.sign_in.EmailSignInScreen
 import com.example.eventorias.presentation.sign_in.GoogleAuthUiClient
 import com.example.eventorias.presentation.sign_in.SignInScreen
 import com.example.eventorias.presentation.sign_in.SignInViewModel
+import com.example.eventorias.presentation.sign_in.Userdata
 import com.example.eventorias.ui.theme.EventoriasTheme
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
@@ -61,7 +63,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    NavHost(navController = navController, startDestination = "create_event") {
+                    NavHost(navController = navController, startDestination = "sign_in") {
                         composable("sign_in") {
                             val viewModel = viewModel<SignInViewModel>()
                             val state by viewModel.state.collectAsStateWithLifecycle()
@@ -91,7 +93,7 @@ class MainActivity : ComponentActivity() {
                                             )
                                             viewModel.onSignInResult(signInResult)
                                             if (signInResult.data != null) {
-                                                navController.navigate("profile")
+                                                navController.navigate("event_list")
                                             }
                                         }
                                     }
@@ -124,7 +126,7 @@ class MainActivity : ComponentActivity() {
                                         val signInResult = emailAuthClient.signIn(email, password)
                                         viewModel.onSignInResult(signInResult)
                                         if (signInResult.data != null) {
-                                            navController.navigate("profile")
+                                            navController.navigate("event_list")
                                         } else {
                                             Toast.makeText(context, signInResult.errorMessage, Toast.LENGTH_LONG).show()
                                         }
@@ -178,6 +180,21 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
+                        composable("event_list") {
+                            val context = LocalContext.current
+                            val users = remember { mutableMapOf<String, Userdata>() }  // Assuming you have a way to populate this
+
+                            EventListScreen(
+                                modifier = Modifier,
+                                users = users,
+                                navHostController = navController,
+                                onFABClick = {
+                                    navController.navigate("create_event")
+                                },
+                                context = context
+                            )
+                        }
+
 
                     }
                 }

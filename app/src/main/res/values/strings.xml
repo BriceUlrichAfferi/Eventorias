@@ -9,5 +9,5 @@
     <string name="create_event_label">Creation of an event</string>
     <string name="contentDescription_go_back">Go back</string>
     <string name="action_valider">Validate</string>
-
+    <string name="description_button_add">Add</string>
 </resources>

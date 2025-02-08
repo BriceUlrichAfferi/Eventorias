@@ -94,7 +94,10 @@ dependencies {
 
     // FirebaseUI
     implementation("com.firebaseui:firebase-ui-auth:8.0.1")
+
+    //Google Play Services
     implementation("com.google.android.gms:play-services-auth:21.3.0")
+    implementation("com.google.android.gms:play-services-base:18.5.0")
 
     //Koin Dependencies
     implementation("io.insert-koin:koin-android:4.0.0") // for Android

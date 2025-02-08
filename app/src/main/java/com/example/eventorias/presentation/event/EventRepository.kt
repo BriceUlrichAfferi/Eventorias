@@ -16,6 +16,28 @@ class EventRepository(private val firestore: FirebaseFirestore) {
      */
     fun getEventsRealtime(): Flow<List<Event>> = callbackFlow {
         val listener = firestore.collection("events")
+            .addSnapshotListener { snapshot, exception ->
+                if (exception != null) {
+                    close(exception)
+                    return@addSnapshotListener
+                }
+
+                val events = snapshot?.documents?.mapNotNull { document ->
+                    Event.fromFirestore(document)
+                } ?: emptyList()
+
+                trySend(events)
+            }
+
+        awaitClose { listener.remove() }
+    }
+
+
+    /**
+     * Retrieves a flow of events ordered by date in descending order.
+     */
+    fun getEventsRealtimeSortedByDate(): Flow<List<Event>> = callbackFlow {
+        val listener = firestore.collection("events")
             .orderBy("date", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, exception ->
                 if (exception != null) {
@@ -32,6 +54,30 @@ class EventRepository(private val firestore: FirebaseFirestore) {
 
         awaitClose { listener.remove() }
     }
+
+    /**
+     * Retrieves a flow of events sorted by category in ascending order.
+     */
+    fun getEventsRealtimeSortedByCategory(): Flow<List<Event>> = callbackFlow {
+        val listener = firestore.collection("events")
+            .orderBy("category", Query.Direction.ASCENDING)
+            .addSnapshotListener { snapshot, exception ->
+                if (exception != null) {
+                    close(exception)
+                    return@addSnapshotListener
+                }
+
+                val events = snapshot?.documents?.mapNotNull { document ->
+                    Event.fromFirestore(document)
+                } ?: emptyList()
+
+                trySend(events)
+            }
+
+        awaitClose { listener.remove() }
+    }
+
+
 
     /**
      * Adds a new event to Firestore.

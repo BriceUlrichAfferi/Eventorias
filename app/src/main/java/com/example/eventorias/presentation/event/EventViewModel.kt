@@ -1,6 +1,7 @@
 package com.example.eventorias.presentation.event
 
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.eventorias.model.Event
@@ -30,10 +31,25 @@ class EventViewModel : ViewModel(), KoinComponent {
         fetchEvents()
     }
 
-    private fun fetchEvents() {
+    fun fetchEvents() {
         viewModelScope.launch {
             repository.getEventsRealtime().collect { events ->
+                Log.d("EventViewModel", "Events fetched: $events")
                 _events.value = events
+            }
+        }
+    }
+
+    fun fetchEventsBySortOption(sortOption: String) {
+        viewModelScope.launch {
+            when (sortOption) {
+                "date" -> repository.getEventsRealtimeSortedByDate().collect { events ->
+                    _events.value = events
+                }
+                "category" -> repository.getEventsRealtimeSortedByCategory().collect { events ->
+                    _events.value = events
+                }
+                else -> fetchEvents() // Default back to unsorted if an unknown option is provided
             }
         }
     }
@@ -110,5 +126,14 @@ class EventViewModel : ViewModel(), KoinComponent {
         _event.value = _event.value.copy(time = time)
     }
 
-    // Add more methods for updating other fields as needed
+    // Sorting methods
+    fun sortEventsByDate() {
+        _events.value = _events.value.sortedWith(Comparator { event1, event2 ->
+            event1.date.atTime(event1.time).compareTo(event2.date.atTime(event2.time))
+        })
+    }
+
+    fun sortEventsByCategory() {
+        _events.value = _events.value.sortedBy { it.category }
+    }
 }
