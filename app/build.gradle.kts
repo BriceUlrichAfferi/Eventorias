@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.eventorias"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -62,8 +62,14 @@ dependencies {
     implementation(libs.androidx.material3)
 
     implementation("androidx.navigation:navigation-compose:2.8.6")
-// Coil (Image loading)
+
+        //Material3 Dependencies for more Icons
+    implementation("androidx.compose.material3:material3:1.4.0-alpha05")
+    implementation("androidx.compose.material:material-icons-extended:1.6.0-alpha05")
+
+    // Coil (Image loading)
     implementation(libs.coil.compose)
+
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-analytics")
@@ -76,6 +82,12 @@ dependencies {
     // Firebase notification dependency
     implementation(libs.firebase.messaging.ktx)
     implementation("com.google.accompanist:accompanist-permissions:0.37.0")
+
+// FireStore and Firebase-Storage dependencies
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-appcheck-debug")
+
 
     // Coroutine support for Firebase tasks
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.2")

@@ -28,6 +28,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.eventorias.presentation.ProfileScreen
+import com.example.eventorias.presentation.event.EventScreen
 import com.example.eventorias.presentation.sign_in.EmailAuthClient
 import com.example.eventorias.presentation.sign_in.EmailSignInScreen
 import com.example.eventorias.presentation.sign_in.GoogleAuthUiClient
@@ -60,7 +61,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    NavHost(navController = navController, startDestination = "sign_in") {
+                    NavHost(navController = navController, startDestination = "create_event") {
                         composable("sign_in") {
                             val viewModel = viewModel<SignInViewModel>()
                             val state by viewModel.state.collectAsStateWithLifecycle()
@@ -160,6 +161,24 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
+
+                        // New route for EventScreen
+                        composable("create_event") {
+                            val context = LocalContext.current // Move this here
+                            EventScreen(
+                                onBackClick = { navController.popBackStack() },
+                                onSaveClick = {
+                                    // Optionally, show success or navigate back
+                                    Toast.makeText(
+                                        context, // Use the context remembered here
+                                        "Event saved successfully",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
+
                     }
                 }
             }

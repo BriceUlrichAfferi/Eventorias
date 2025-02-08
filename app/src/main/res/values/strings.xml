@@ -6,7 +6,8 @@
     <string name="notifications_enabled">Nofifications enabled</string>
     <string name="notifications_disabled">Nofifications disabled</string>
     <string name="notifications">Nofifications</string>
-
-
+    <string name="create_event_label">Creation of an event</string>
+    <string name="contentDescription_go_back">Go back</string>
+    <string name="action_valider">Validate</string>
 
 </resources>

@@ -7,5 +7,8 @@
     <string name="notifications_enabled">Notifications activées</string>
     <string name="notifications_disabled">Notifications désactivées</string>
     <string name="notifications">Nofifications</string>
+    <string name="create_event_label">Création d\'un événement</string>
+    <string name="contentDescription_go_back">Retournez</string>
+    <string name="action_valider">Valider</string>
 
 </resources>
