@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "725796677671",
+    "project_id": "eventoriassignin",
+    "storage_bucket": "eventoriassignin.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725796677671:android:ddc8e2f221bffc4821c602",
+        "android_client_info": {
+          "package_name": "com.example.eventorias"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "725796677671-2hhlf1p6hg8h6fc01fh2gdam18h5jne6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.eventorias",
+            "certificate_hash": "b8c630619a3e954fef850009705433d12eb2f298"
+          }
+        },
+        {
+          "client_id": "725796677671-t2hp8tuhbsf0ct7gn1cus47u7auki62j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtp6fspmji8bgMc1PpZ-2RUqsdk0eOg9E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "725796677671-t2hp8tuhbsf0ct7gn1cus47u7auki62j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

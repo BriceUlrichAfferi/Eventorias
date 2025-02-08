@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Eventorias</string>
+    <string name="web_client_id">725796677671-t2hp8tuhbsf0ct7gn1cus47u7auki62j.apps.googleusercontent.com</string>
+    <string name="user_profile">Profil utilisateur</string>
+    <string name="contentDescription_notification_icon">Icone de notification</string>
+    <string name="notifications_enabled">Notifications activées</string>
+    <string name="notifications_disabled">Notifications désactivées</string>
+    <string name="notifications">Nofifications</string>
+
+</resources>
