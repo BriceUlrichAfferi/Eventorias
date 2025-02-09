@@ -33,6 +33,7 @@ class EventRepository(private val firestore: FirebaseFirestore) {
     }
 
 
+
     /**
      * Retrieves a flow of events ordered by date in descending order.
      */

@@ -12,5 +12,6 @@ data class Userdata(
     val userId: String,
     val userName: String,
     val email: String,
-    val profilePictureUrl: String?
+    val profilePictureUrl: String?,
+    val photoUrl: String?
 )

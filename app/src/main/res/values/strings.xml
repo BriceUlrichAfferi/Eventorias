@@ -2,6 +2,7 @@
     <string name="app_name">Eventorias</string>
     <string name="web_client_id">725796677671-t2hp8tuhbsf0ct7gn1cus47u7auki62j.apps.googleusercontent.com</string>
     <string name="user_profile">User profile</string>
+    <string name="event_list">Event list</string>
     <string name="contentDescription_notification_icon">Notification icon</string>
     <string name="notifications_enabled">Nofifications enabled</string>
     <string name="notifications_disabled">Nofifications disabled</string>
@@ -10,4 +11,11 @@
     <string name="contentDescription_go_back">Go back</string>
     <string name="action_valider">Validate</string>
     <string name="description_button_add">Add</string>
+    <string name="no_description">Description not available</string>
+    <string name="no_profilePic">No profile image</string>
+    <string name="error_occured">An error occurred,\nplease try again later</string>
+    <string name="error">Erreur </string>
+    <string name="bottom_navigation_events">Events</string>
+    <string name="bottom_navigation_profile">Profile</string>
+
 </resources>

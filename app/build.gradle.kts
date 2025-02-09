@@ -103,6 +103,12 @@ dependencies {
     implementation("io.insert-koin:koin-android:4.0.0") // for Android
     implementation("io.insert-koin:koin-androidx-compose:4.0.0") // for Jetpack Compose
 
+
+    //okhttp Dependency
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+
+
     // Firebase dependencies for testing
     testImplementation ("com.google.firebase:firebase-auth:21.0.7")
     testImplementation ("io.mockk:mockk:1.12.0")

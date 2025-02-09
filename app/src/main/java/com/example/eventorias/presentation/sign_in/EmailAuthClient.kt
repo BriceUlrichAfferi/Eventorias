@@ -18,7 +18,8 @@ class EmailAuthClient {
                         userId = uid,
                         userName = displayName ?: "No Name",
                         email = email,
-                        profilePictureUrl = photoUrl?.toString()
+                        profilePictureUrl = photoUrl?.toString(),
+                        photoUrl = photoUrl?.toString()
                     )
                 },
                 errorMessage = null
@@ -45,8 +46,8 @@ class EmailAuthClient {
                         userId = uid,
                         userName = email, // Initially set username to email
                         email = email,
-                        profilePictureUrl = null // No profile picture at creation
-                    )
+                        profilePictureUrl = null, // No profile picture at creation
+                        photoUrl = photoUrl?.toString())
                 },
                 errorMessage = null
             )
@@ -74,7 +75,8 @@ class EmailAuthClient {
                 userId = uid,
                 userName = displayName ?: email ?: "No Name",
                 email = it,
-                profilePictureUrl = photoUrl?.toString()
+                profilePictureUrl = photoUrl?.toString(),
+                photoUrl = photoUrl?.toString()
             )
         }
     }

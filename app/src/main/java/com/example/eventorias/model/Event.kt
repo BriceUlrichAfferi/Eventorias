@@ -15,7 +15,7 @@ data class Event(
     val location: String = "",
     val category: String = "",
     val photoUrl: String? = null,
-    val userProfileUrl: String? = null  // <-- Add this field
+    val userProfileUrl: String? = null
 )
  {
      companion object {
