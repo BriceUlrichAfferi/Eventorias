@@ -17,9 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,6 +43,10 @@ import com.example.eventorias.ui.theme.EventoriasTheme
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import com.example.eventorias.presentation.botomNavigation.EventoriasBottomNavigation
+import com.example.eventorias.presentation.botomNavigation.email_log_in.LoginScreen
+import com.example.eventorias.presentation.botomNavigation.email_log_in.PasswordRecoveryScreen
+import com.example.eventorias.presentation.email_sign_up.SignUpScreen
+
 class MainActivity : ComponentActivity() {
 
     private val googleAuthUiClient by lazy {
@@ -76,7 +78,17 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     bottomBar = {
                         if (showBottomBar) {
-                            EventoriasBottomNavigation()  // Bottom bar should be shown only on specific routes
+                            EventoriasBottomNavigation(
+                                currentRoute = currentDestination?.destination?.route,
+
+                                onEventClick = {
+                                    navController.navigate("event_list")
+                                },
+                                onProfileClick = {
+                                    navController.navigate("profile")
+                                }
+
+                            )  // Bottom bar should be shown only on specific routes
                         }
                     }
                 ) { paddingValues ->
@@ -136,51 +148,26 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
 
-                            composable("email_sign_in") {
-                                var email by remember { mutableStateOf("") }
-                                var password by remember { mutableStateOf("") }
-                                val context = LocalContext.current
-                                val viewModel = viewModel<SignInViewModel>()
 
-                                EmailSignInScreen(
-                                    email = email,
-                                    password = password,
-                                    onEmailChange = { email = it },
-                                    onPasswordChange = { password = it },
-                                    onSignInClick = {
-                                        lifecycleScope.launch {
-                                            val signInResult =
-                                                emailAuthClient.signIn(email, password)
-                                            viewModel.onSignInResult(signInResult)
-                                            if (signInResult.data != null) {
-                                                navController.navigate("event_list")
-                                            } else {
-                                                Toast.makeText(
-                                                    context,
-                                                    signInResult.errorMessage,
-                                                    Toast.LENGTH_LONG
-                                                ).show()
+
+                                composable("email_sign_in") {
+                                    EmailSignInScreen(
+                                        onLogInClick = {
+                                            navController.navigate("log_in") {
+                                                // This ensures the back stack only includes InitialLoginScreen and HomefeedScreen
+                                                popUpTo("event_list") { inclusive = false }
                                             }
-                                        }
-                                    },
-                                    onSignUpClick = {
-                                        lifecycleScope.launch {
-                                            val signUpResult =
-                                                emailAuthClient.createUser(email, password)
-                                            viewModel.onSignInResult(signUpResult)
-                                            if (signUpResult.data != null) {
-                                                navController.navigate("profile")
-                                            } else {
-                                                Toast.makeText(
-                                                    context,
-                                                    signUpResult.errorMessage,
-                                                    Toast.LENGTH_LONG
-                                                ).show()
+                                        },
+                                        onSignUpClick = {
+                                            navController.navigate("sign_up") {
+                                                // This ensures the back stack only includes InitialLoginScreen and HomefeedScreen
+                                                popUpTo("event_list") { inclusive = false }
                                             }
-                                        }
-                                    }
-                                )
-                            }
+                                        },
+                                        navController = navController
+                                    )
+                                }
+
 
                             composable("profile") {
                                 ProfileScreen(
@@ -201,7 +188,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
 
-                            // New route for EventScreen
+                            // Route for EventScreen
                             composable("create_event") {
                                 val context = LocalContext.current // Move this here
                                 EventScreen(
@@ -258,7 +245,25 @@ class MainActivity : ComponentActivity() {
                                     onBackClick = { navController.popBackStack() }
                                 )
                             }
+                            // New route for Sign Up Screen
+                            composable("sign_up") {
+                                SignUpScreen(
+                                    onLoginSuccess = { navController.navigateUp()},
+                                    navController = navController
+                                )
+                            }
 
+                            composable("log_in") {
+                                LoginScreen(
+                                    navController = navController
+                                )
+                            }
+
+                            composable("password_recovery") {
+                                PasswordRecoveryScreen(
+                                    navController = navController
+                                )
+                            }
 
                         }
                     }

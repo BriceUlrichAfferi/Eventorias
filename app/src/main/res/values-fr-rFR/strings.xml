@@ -18,6 +18,21 @@
     <string name="error">Erreur </string>
     <string name="bottom_navigation_events">Événements</string>
     <string name="bottom_navigation_profile">Profile</string>
+    <string name="sign_up">S\'inscrire</string>
+    <string name="sign_in_email">Connectez-vous avec votre e-mail</string>
 
+    <string name="sign_in">Se connecter</string>
+    <string name="enter_email">Saisissez votre e-mail</string>
+    <string name="email">E-mail</string>
+    <string name="next">Suivant</string>
+    <string name="enter_name_surname">Entrez votre nom et prénom</string>
+    <string name="enter_password">Saisissez votre mot de passe</string>
+    <string name="password">Mot de passe</string>
+    <string name="name">Nom</string>
+    <string name="surname">Prénom</string>
+    <string name="save">Sauvegarder</string>
+    <string name="password_recovery_label">Les instructions relatives à la réinitialisatio n de votre mot de passe seront envoyées à cette adresse e-mail.</string>
+    <string name="password_recovery">Récupérer votre mot de passe</string>
+    <string name="password_recovery_message">Consultez votre boîte de réception. \nSuivez les instructions envoyées à l\'adresse %1$s pour récupérer votre mot de passe.</string>
 
 </resources>

@@ -75,7 +75,7 @@ fun SignInScreen(
                 modifier = Modifier
                     .wrapContentSize()
                     .padding(bottom = 16.dp),
-                contentAlignment = androidx.compose.ui.Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
                 GoogleSignInButton { onGoogleSignInClick() }
             }
@@ -111,7 +111,9 @@ fun GoogleSignInButton(onClick: () -> Unit) {
 
 
 @Composable
-fun EmailSignInButton(onClick: () -> Unit) {
+fun EmailSignInButton(
+    onClick: () -> Unit
+) {
     Button(
         onClick = onClick,
         modifier = Modifier

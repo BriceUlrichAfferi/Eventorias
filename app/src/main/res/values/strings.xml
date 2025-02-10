@@ -17,5 +17,19 @@
     <string name="error">Erreur </string>
     <string name="bottom_navigation_events">Events</string>
     <string name="bottom_navigation_profile">Profile</string>
-
+    <string name="sign_up">Sign up</string>
+    <string name="sign_in_email">Sign in with Email</string>
+    <string name="sign_in">Sign in</string>
+    <string name="enter_email">Enter your email</string>
+    <string name="email">Email</string>
+    <string name="next">Next</string>
+    <string name="enter_name_surname">Enter your name and surname</string>
+    <string name="enter_password">Enter your password</string>
+    <string name="password">Password</string>
+    <string name="name">First Name</string>
+    <string name="surname">Surname</string>
+    <string name="save">Save</string>
+    <string name="password_recovery">Recover password</string>
+    <string name="password_recovery_label">Receive instructions to this email that explain how to reset your password.</string>
+    <string name="password_recovery_message">Check your email. \nFollow the instructions sent to %1$s to recover your password.</string>
 </resources>
