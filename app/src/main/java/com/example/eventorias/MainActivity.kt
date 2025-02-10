@@ -182,7 +182,9 @@ class MainActivity : ComponentActivity() {
                                                 "Signed out",
                                                 Toast.LENGTH_LONG
                                             ).show()
-                                            navController.popBackStack("sign_in", false)
+                                            navController.navigate("sign_in"){
+                                                popUpTo(0) { inclusive = true }
+                                            }
                                         }
                                     }
                                 )
@@ -248,8 +250,12 @@ class MainActivity : ComponentActivity() {
                             // New route for Sign Up Screen
                             composable("sign_up") {
                                 SignUpScreen(
-                                    onLoginSuccess = { navController.navigateUp()},
-                                    navController = navController
+                                    onLoginSuccess = {
+                                        navController.navigate("event_list") {
+                                            popUpTo("sign_up") { inclusive = true } // Clears 'sign_up' from the back stack
+                                        }
+                                    },
+                                      navController = navController
                                 )
                             }
 

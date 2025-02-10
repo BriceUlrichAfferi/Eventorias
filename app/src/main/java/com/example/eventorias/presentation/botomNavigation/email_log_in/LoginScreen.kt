@@ -139,7 +139,7 @@ fun LoginScreen(
                         }
                     },
                     modifier = Modifier
-                            .padding(16.dp, bottom = 16.dp)
+                    .padding(16.dp, bottom = 16.dp)
                     .width(150.dp)
                     .height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
@@ -210,7 +210,10 @@ fun LoginScreen(
                             auth.signInWithEmailAndPassword(email.value, password.value)
                                 .addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
-                                        navController.navigate("event_list") // Navigate to AccountManagementScreen
+                                        navController.navigate("event_list") {
+                                            popUpTo(0) { inclusive = true } // Clears the entire back stack
+                                        }
+
 
                                         Toast.makeText(navController.context, "Sign in successful", Toast.LENGTH_SHORT).show()
                                     } else {
