@@ -20,9 +20,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -31,7 +28,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,12 +37,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -57,13 +50,13 @@ import com.google.firebase.auth.FirebaseAuth
 fun LoginScreen(
     navController: NavController
 ) {
-    val email = remember { mutableStateOf("") }
-    val password = remember { mutableStateOf("") }
-    val emailError = remember { mutableStateOf<String?>(null) }
-    val passwordError = remember { mutableStateOf<String?>(null) }
-    val currentStep = remember { mutableStateOf(1) } // Step 1 for email, Step 2 for password
+    val email = rememberSaveable { mutableStateOf("") }
+    val password = rememberSaveable { mutableStateOf("") }
+    val emailError = rememberSaveable { mutableStateOf<String?>(null) }
+    val passwordError =rememberSaveable { mutableStateOf<String?>(null) }
+    val currentStep = rememberSaveable { mutableStateOf(1) }
     val auth = FirebaseAuth.getInstance()
-    var passwordVisible by remember { mutableStateOf(false) }
+    var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -76,9 +69,9 @@ fun LoginScreen(
                     IconButton(
                         onClick = {
                         if (currentStep.value > 1) {
-                            currentStep.value -= 1 // Go back to the previous step
+                            currentStep.value -= 1
                         } else {
-                            navController.navigate("email_sign_in") // Navigate to AccountManagementScreen
+                            navController.navigate("email_sign_in")
 
                         }
                     }
@@ -139,9 +132,9 @@ fun LoginScreen(
                         }
                     },
                     modifier = Modifier
-                    .padding(16.dp, bottom = 16.dp)
-                    .width(150.dp)
-                    .height(50.dp),
+                        .padding(16.dp, bottom = 16.dp)
+                        .width(150.dp)
+                        .height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                     shape = RectangleShape,
                 ) {
@@ -151,28 +144,6 @@ fun LoginScreen(
 
             // Step 2: Password input
             if (currentStep.value == 2) {
-                // Display the welcome back message
-                // Display the welcome back message with bold email
-                val welcomeBackText = if (email.value.isNotBlank()) {
-                    buildAnnotatedString {
-                        val welcomeText = stringResource(R.string.sign_in, email.value)
-                        append(welcomeText)
-                        if (welcomeText.contains(email.value)) {
-                            val start = welcomeText.indexOf(email.value)
-                            val end = start + email.value.length
-                            if (end <= welcomeText.length) {
-                                addStyle(
-                                    style = SpanStyle(fontWeight = FontWeight.Bold),
-                                    start = start,
-                                    end = end
-                                )
-                            }
-                        }
-                    }
-                } else {
-                    stringResource(R.string.sign_in, "")
-                }
-
 
                 Spacer(modifier = Modifier.height(16.dp))
 

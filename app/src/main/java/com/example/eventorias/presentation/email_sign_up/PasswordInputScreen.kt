@@ -72,6 +72,7 @@ fun PasswordInputScreen(
                 text = stringResource(id = R.string.password),
                 color = Color.White
             ) },
+
             isError = passwordError.value != null,
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -79,7 +80,11 @@ fun PasswordInputScreen(
                 val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
                 val description = if (passwordVisible) "Hide password" else "Show password"
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, contentDescription = description)
+                    Icon(
+                        imageVector = image,
+                        contentDescription = description,
+                        tint = Color.White
+                    )
                 }
             },
             colors = TextFieldDefaults.colors(

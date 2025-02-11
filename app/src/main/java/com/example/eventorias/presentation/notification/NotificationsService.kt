@@ -12,14 +12,13 @@ import com.google.firebase.messaging.RemoteMessage
 
 class NotificationsService : FirebaseMessagingService() {
 
-    override fun onNewToken(token: String) {
-        super.onNewToken(token)
-        Log.d("FCM Token", "New token: $token")
-        // You can send the token to your server if needed
-    }
-
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
+
+        if (!areNotificationsEnabled()) {
+            Log.d("FCM Message", "Notifications are disabled, ignoring message.")
+            return
+        }
 
         Log.d("FCM Message", "From: ${remoteMessage.from}")
 
@@ -33,11 +32,15 @@ class NotificationsService : FirebaseMessagingService() {
         }
     }
 
+    private fun areNotificationsEnabled(): Boolean {
+        val sharedPreferences = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        return sharedPreferences.getBoolean("notifications_enabled", false)
+    }
+
     fun sendNotification(title: String, messageBody: String?) {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channelId = "default_channel"
 
-        // Create notification channel for Android 8.0 and above
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,

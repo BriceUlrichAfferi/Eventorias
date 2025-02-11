@@ -7,7 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-@Composable
+/*@Composable
 fun AuthOptionsScreen(
     onGoogleSignInClick: () -> Unit,
     onEmailSignInClick: () -> Unit
@@ -26,4 +26,4 @@ fun AuthOptionsScreen(
             }
         }
     }
-}
+}*/

@@ -64,8 +64,7 @@ fun EventScreen(
     ) { success ->
         if (success) {
             imageUri?.let {
-                // Handle the captured image
-                // You can use the imageUri here to display or upload the image
+
             }
         }
     }
@@ -342,7 +341,7 @@ fun saveEventToFirestore(
             .addOnSuccessListener { taskSnapshot ->
                 storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
                     eventData["photoUrl"] = downloadUri.toString()
-                    eventData["userProfileUrl"] = userProfileUrl ?: "" // Add user's profile URL
+                    eventData["userProfileUrl"] = userProfileUrl ?: ""
 
                     firestore.collection("events").document(eventId)
                         .set(eventData)
@@ -360,7 +359,7 @@ fun saveEventToFirestore(
                 onComplete(false, e.message)
             }
     } else {
-        eventData["userProfileUrl"] = userProfileUrl ?: "" // Add user's profile URL even if no event image
+        eventData["userProfileUrl"] = userProfileUrl ?: ""
         firestore.collection("events").document(eventId)
             .set(eventData)
             .addOnSuccessListener {

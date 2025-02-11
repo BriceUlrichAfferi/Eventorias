@@ -3,7 +3,7 @@ package com.example.eventorias.presentation.notification
 import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 
-class NotificationViewModel  (
+class NotificationViewModel(
     private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 

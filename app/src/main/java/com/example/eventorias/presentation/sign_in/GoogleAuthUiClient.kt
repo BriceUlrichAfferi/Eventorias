@@ -3,7 +3,6 @@ package com.example.eventorias.presentation.sign_in
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
-import android.util.Log
 import com.example.eventorias.R
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdTokenRequestOptions
@@ -27,7 +26,6 @@ class GoogleAuthUiClient(
             val result = oneTapClient.beginSignIn(builSignInRequest()).await()
             result?.pendingIntent?.intentSender
         } catch (e: Exception) {
-            Log.e("GoogleSignInError", "Sign-in request failed: ${e.localizedMessage}", e)
             if (e is CancellationException) throw e
             null
         }
@@ -55,7 +53,6 @@ class GoogleAuthUiClient(
                 errorMessage = null
             )
         } catch (e: Exception) {
-            Log.e("GoogleSignInError", "Sign-in failed: ${e.localizedMessage}", e)
             if (e is CancellationException) throw e
             SignInResult(
                 data = null,
@@ -76,15 +73,13 @@ class GoogleAuthUiClient(
     }
 
     fun getSignedInUser(): Userdata? = auth.currentUser?.run {
-        email?.let {
-            Userdata(
-                userId = uid,
-                userName = displayName.toString(),
-                email = it,
-                profilePictureUrl = photoUrl?.toString(),
-                photoUrl = photoUrl?.toString()
-            )
-        }
+        Userdata(
+            userId = uid,
+            userName = displayName ?: "No Name",
+            email = email ?: "No Email",
+            profilePictureUrl = photoUrl?.toString() ?: "",
+            photoUrl = photoUrl?.toString() ?: ""
+        )
     }
 
 

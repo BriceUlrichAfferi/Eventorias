@@ -15,14 +15,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,23 +28,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
 import com.example.eventorias.R
 import com.example.eventorias.model.Event
-import com.example.eventorias.presentation.event.EventViewModel
 import java.time.format.DateTimeFormatter
 import androidx.lifecycle.viewmodel.compose.viewModel
-
-import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.eventorias.presentation.sign_in.Userdata
 import kotlinx.coroutines.delay
@@ -63,7 +55,7 @@ fun EventListScreen(
 ) {
     val eventViewModel: EventViewModel = viewModel()
     val events by eventViewModel.events.collectAsState(initial = emptyList())
-    val errorMessage by eventViewModel.error.collectAsState() // Observe error state
+    val errorMessage by eventViewModel.error.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     var sortOption by remember { mutableStateOf("date") }
     var isSearchExpanded by remember { mutableStateOf(false) }
@@ -87,7 +79,10 @@ fun EventListScreen(
                             TextField(
                                 value = searchQuery,
                                 onValueChange = { searchQuery = it },
-                                placeholder = { Text("Search events") },
+                                placeholder = { Text(
+                                    "Search events",
+                                    color = Color.White
+                                ) },
                                 modifier = Modifier
                                     .weight(1f)
                                     .padding(start = 16.dp),
@@ -105,9 +100,16 @@ fun EventListScreen(
                                     }
                                 },
                                 colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    cursorColor = MaterialTheme.colorScheme.primary
+                                    focusedTextColor = Color.White,
+                                    unfocusedTextColor = Color.White,
+                                    disabledTextColor = Color.Gray,
+                                    focusedIndicatorColor = Color.White,
+                                    unfocusedIndicatorColor = Color.White,
+                                    focusedLabelColor = Color.White,
+                                    unfocusedLabelColor = Color.White,
+                                    focusedContainerColor = colorResource(id = R.color.grey_pro),
+                                    unfocusedContainerColor = colorResource(id = R.color.grey_pro),
+                                    disabledContainerColor = Color.LightGray,
                                 ),
                                 singleLine = true
                             )
@@ -208,7 +210,7 @@ fun EventListScreen(
 
 @Composable
 fun LoadingScreen() {
-    var progress by remember { mutableStateOf(0f) }
+    var progress by rememberSaveable { mutableStateOf(0f) }
     val progressAnim = animateFloatAsState(
         targetValue = progress,
         animationSpec = tween(durationMillis = 2000, easing = LinearEasing),
@@ -218,7 +220,7 @@ fun LoadingScreen() {
     LaunchedEffect(Unit) {
         while (progress < 1f) {
             delay(200) // Simulate loading steps
-            progress += 0.1f // Increase progress
+            progress += 0.1f
         }
     }
 
@@ -325,7 +327,7 @@ fun EventItem(event: Event, user: Userdata, onEventClick: (Event) -> Unit) {
                 }
             }
 
-            // User linked picture from event.photoUrl (Aligned to right)
+            // User linked picture from event.photoUrl
             if (!event.photoUrl.isNullOrEmpty()) {
                 AsyncImage(
                     model = event.photoUrl,
@@ -334,7 +336,7 @@ fun EventItem(event: Event, user: Userdata, onEventClick: (Event) -> Unit) {
                     modifier = Modifier
                         .size(87.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .align(Alignment.CenterEnd) // Align to right
+                        .align(Alignment.CenterEnd)
                 )
             } else {
                 Icon(
@@ -343,8 +345,8 @@ fun EventItem(event: Event, user: Userdata, onEventClick: (Event) -> Unit) {
                     modifier = Modifier
                         .size(75.dp)
                         .clip(CircleShape)
-                        .align(Alignment.CenterEnd) // Align to right
-                        .padding(end = 16.dp) // Add padding from the right edge
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 16.dp)
                 )
             }
         }

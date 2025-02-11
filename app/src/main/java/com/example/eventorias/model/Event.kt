@@ -19,6 +19,8 @@ data class Event(
 )
  {
      companion object {
+
+         // Fetch from Firestore
          fun fromFirestore(document: DocumentSnapshot): Event? {
              val map = document.data ?: return null
 
@@ -31,10 +33,10 @@ data class Event(
                  location = map["location"] as? String ?: "",
                  category = map["category"] as? String ?: "",
                  photoUrl = map["photoUrl"] as? String,
-                 userProfileUrl = map["userProfileUrl"] as? String // <-- Fetch from Firestore
+                 userProfileUrl = map["userProfileUrl"] as? String
              )
          }
-
+         // Store to Firestore
          fun toFirestore(event: Event): Map<String, Any> {
              val timestamp = Timestamp(event.date.atTime(event.time).toEpochSecond(java.time.ZoneOffset.UTC), 0)
              return mapOf(
@@ -45,7 +47,7 @@ data class Event(
                  "location" to event.location,
                  "category" to event.category,
                  "photoUrl" to (event.photoUrl ?: ""),
-                 "userProfileUrl" to (event.userProfileUrl ?: "") // <-- Store it back to Firestore
+                 "userProfileUrl" to (event.userProfileUrl ?: "")
              )
          }
      }

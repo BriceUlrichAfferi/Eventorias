@@ -1,6 +1,5 @@
 package com.example.eventorias.presentation.sign_in
 
-import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.auth
@@ -25,7 +24,6 @@ class EmailAuthClient {
                 errorMessage = null
             )
         } catch (e: FirebaseAuthException) {
-            Log.e("EmailSignInError", "Sign-in failed: ${e.localizedMessage}", e)
             SignInResult(
                 data = null,
                 errorMessage = when (e.errorCode) {
@@ -52,7 +50,6 @@ class EmailAuthClient {
                 errorMessage = null
             )
         } catch (e: FirebaseAuthException) {
-            Log.e("EmailSignUpError", "Sign-up failed: ${e.localizedMessage}", e)
             SignInResult(
                 data = null,
                 errorMessage = when (e.errorCode) {

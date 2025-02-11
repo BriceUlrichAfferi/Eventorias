@@ -1,7 +1,5 @@
 package com.example.eventorias.presentation.sign_in
 
-import androidx.lifecycle.LiveData
-import com.google.firebase.firestore.core.UserData
 
 data class SignInResult(
     val data: Userdata?,

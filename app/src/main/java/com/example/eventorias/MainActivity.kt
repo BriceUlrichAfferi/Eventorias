@@ -1,6 +1,7 @@
 package com.example.eventorias
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -13,14 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -65,11 +63,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             EventoriasTheme {
-                // Create the navController outside the surface
                 val navController = rememberNavController()
                 val currentDestination by navController.currentBackStackEntryAsState()
 
-                // Check if the current route should show the bottom bar
+                // Show the bottom bar for the current route
                 val showBottomBar = when (currentDestination?.destination?.route) {
                     "event_list", "profile" -> true
                     else -> false
@@ -88,7 +85,7 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate("profile")
                                 }
 
-                            )  // Bottom bar should be shown only on specific routes
+                            )
                         }
                     }
                 ) { paddingValues ->
@@ -99,7 +96,6 @@ class MainActivity : ComponentActivity() {
                             .padding(paddingValues),
                         color = MaterialTheme.colorScheme.background,
                     ) {
-                        // Only create the NavHost once, not inside Surface
                         NavHost(navController = navController, startDestination = "sign_in") {
                         composable("sign_in") {
                                 val viewModel = viewModel<SignInViewModel>()
@@ -118,6 +114,7 @@ class MainActivity : ComponentActivity() {
 
                             composable("google_sign_in") {
                                 val viewModel = viewModel<SignInViewModel>()
+
                                 val state by viewModel.state.collectAsStateWithLifecycle()
 
                                 val googleSignInLauncher = rememberLauncherForActivityResult(
@@ -125,13 +122,15 @@ class MainActivity : ComponentActivity() {
                                     onResult = { result ->
                                         if (result.resultCode == RESULT_OK) {
                                             lifecycleScope.launch {
-                                                val signInResult =
-                                                    googleAuthUiClient.signInWithIntent(
-                                                        intent = result.data ?: return@launch
-                                                    )
+                                                val signInResult = googleAuthUiClient.signInWithIntent(intent = result.data ?: return@launch)
+                                                Log.d("SignIn", "Google Sign-In Result: $signInResult")
                                                 viewModel.onSignInResult(signInResult)
                                                 if (signInResult.data != null) {
-                                                    navController.navigate("event_list")
+                                                    Log.d("SignIn", "Navigating to profile")
+                                                    navController.navigate("event_list") {
+                                                        popUpTo(navController.graph.startDestinationId)
+                                                        launchSingleTop = true
+                                                    }
                                                 }
                                             }
                                         }
@@ -141,6 +140,7 @@ class MainActivity : ComponentActivity() {
                                 LaunchedEffect(key1 = Unit) {
                                     val intentSender = googleAuthUiClient.signIn()
                                     if (intentSender != null) {
+                                        Log.d("SignIn", "Launching Google Sign-In")
                                         googleSignInLauncher.launch(
                                             IntentSenderRequest.Builder(intentSender).build()
                                         )
@@ -154,13 +154,13 @@ class MainActivity : ComponentActivity() {
                                     EmailSignInScreen(
                                         onLogInClick = {
                                             navController.navigate("log_in") {
-                                                // This ensures the back stack only includes InitialLoginScreen and HomefeedScreen
+                                                // Clears elements from the back stack
+
                                                 popUpTo("event_list") { inclusive = false }
                                             }
                                         },
                                         onSignUpClick = {
                                             navController.navigate("sign_up") {
-                                                // This ensures the back stack only includes InitialLoginScreen and HomefeedScreen
                                                 popUpTo("event_list") { inclusive = false }
                                             }
                                         },
@@ -173,6 +173,7 @@ class MainActivity : ComponentActivity() {
                                 ProfileScreen(
                                     userdata = googleAuthUiClient.getSignedInUser()
                                         ?: emailAuthClient.getSignedInUser(),
+                                    googleAuthUiClient = googleAuthUiClient, // Pass googleAuthUiClient here
                                     onSignOut = {
                                         lifecycleScope.launch {
                                             googleAuthUiClient.signOut()
@@ -182,7 +183,7 @@ class MainActivity : ComponentActivity() {
                                                 "Signed out",
                                                 Toast.LENGTH_LONG
                                             ).show()
-                                            navController.navigate("sign_in"){
+                                            navController.navigate("sign_in") {
                                                 popUpTo(0) { inclusive = true }
                                             }
                                         }
@@ -190,15 +191,15 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
 
+
                             // Route for EventScreen
                             composable("create_event") {
-                                val context = LocalContext.current // Move this here
+                                val context = LocalContext.current
                                 EventScreen(
                                     onBackClick = { navController.popBackStack() },
                                     onSaveClick = {
-                                        // Optionally, show success or navigate back
                                         Toast.makeText(
-                                            context, // Use the context remembered here
+                                            context,
                                             "Event saved successfully",
                                             Toast.LENGTH_SHORT
                                         ).show()
@@ -210,7 +211,7 @@ class MainActivity : ComponentActivity() {
                             composable("event_list") {
                                 val context = LocalContext.current
                                 val users =
-                                    remember { mutableMapOf<String, Userdata>() } // Assuming you populate this
+                                    rememberSaveable { mutableMapOf<String, Userdata>() }
 
                                 val onEventClick: (Event) -> Unit = { event ->
                                     try {
@@ -230,7 +231,7 @@ class MainActivity : ComponentActivity() {
                                     onFABClick = {
                                         navController.navigate("create_event")
                                     },
-                                    onEventClick = onEventClick, // Pass it to EventListScreen
+                                    onEventClick = onEventClick,
                                     context = context
                                 )
                             }
@@ -247,12 +248,13 @@ class MainActivity : ComponentActivity() {
                                     onBackClick = { navController.popBackStack() }
                                 )
                             }
-                            // New route for Sign Up Screen
+                            // Route for Sign Up Screen
                             composable("sign_up") {
                                 SignUpScreen(
                                     onLoginSuccess = {
                                         navController.navigate("event_list") {
-                                            popUpTo("sign_up") { inclusive = true } // Clears 'sign_up' from the back stack
+                                            // Clears 'sign_up' from the back stack
+                                            popUpTo("sign_up") { inclusive = true }
                                         }
                                     },
                                       navController = navController
@@ -275,23 +277,6 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
-        }
-    }
-
-
-    @Composable
-    fun Greeting(name: String, modifier: Modifier = Modifier) {
-        Text(
-            text = "Hello $name!",
-            modifier = modifier
-        )
-    }
-
-    @Preview(showBackground = true)
-    @Composable
-    fun GreetingPreview() {
-        EventoriasTheme {
-            Greeting("Android")
         }
     }
 

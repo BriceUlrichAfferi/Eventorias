@@ -132,7 +132,7 @@ fun NameSurnameInputScreen(
         // Next Button to proceed to password screen
         Button(
             onClick = {
-                // Validate name and surname
+
                 nameError = when {
                     name.isBlank() -> "Name cannot be empty"
                     else -> null
@@ -143,7 +143,6 @@ fun NameSurnameInputScreen(
                     else -> null
                 }
 
-                // If there are no errors, proceed to next screen
                 if (nameError == null && surnameError == null) {
                     onNext()
                 }

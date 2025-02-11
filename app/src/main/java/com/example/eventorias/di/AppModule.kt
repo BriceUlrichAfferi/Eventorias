@@ -11,22 +11,20 @@ import org.koin.dsl.module
 
 val appModule = module {
 
-    // Provide SharedPreferences instance
+    // Instances
+    single { FirebaseFirestore.getInstance() }
+
     single<SharedPreferences> {
         get<Context>().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
     }
 
-    // Provide NotificationViewModel
+    // ViewModels
     viewModel { NotificationViewModel(get()) }
+    viewModel { EventViewModel() }
 
-
-    // Provide FirebaseFirestore instance
-    single { FirebaseFirestore.getInstance() }
-
-    // Provide EventRepository
+    // Repositories
     single<EventRepository> { EventRepository(get()) }
 
-    // Provide EventViewModel
-    viewModel { EventViewModel() }
+
 
 }

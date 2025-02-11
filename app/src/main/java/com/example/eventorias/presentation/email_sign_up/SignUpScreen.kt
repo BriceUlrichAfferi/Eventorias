@@ -2,7 +2,12 @@ package com.example.eventorias.presentation.email_sign_up
 
 import android.util.Patterns
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -14,10 +19,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.eventorias.R
 import com.google.firebase.auth.FirebaseAuth
@@ -30,23 +39,20 @@ import com.google.firebase.firestore.FirebaseFirestore
     navController: NavController
     ) {
     val context = LocalContext.current
-    val email = remember { mutableStateOf("") }
-    val name = remember { mutableStateOf("") }
-    val surname = remember { mutableStateOf("") }
-    val emailError = remember { mutableStateOf<String?>(null) }
+    val email = rememberSaveable { mutableStateOf("") }
+    val name = rememberSaveable { mutableStateOf("") }
+    val surname = rememberSaveable { mutableStateOf("") }
+    val emailError = rememberSaveable { mutableStateOf<String?>(null) }
 
 
-    val currentStep = remember { mutableStateOf(1) } // Starting from 0 for initial login screen
+    val currentStep = rememberSaveable { mutableStateOf(1) }
 
     // Sign-in state variables
-    val password = remember { mutableStateOf("") }
-    val passwordError = remember { mutableStateOf<String?>(null) }
+    val password = rememberSaveable { mutableStateOf("") }
+    val passwordError = rememberSaveable { mutableStateOf<String?>(null) }
 
     val auth = FirebaseAuth.getInstance()
-    val currentUser = auth.currentUser
 
-    // Check authentication status
-    val toastShown = remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -54,21 +60,25 @@ import com.google.firebase.firestore.FirebaseFirestore
                 val title = when (currentStep.value) {
                     1 -> R.string.sign_up
                     2 -> R.string.sign_up
-                    else -> R.string.sign_up // Default title, assuming you have one
+                    else -> R.string.sign_up
                 }
                 TopAppBar(
-                    title = { Text(text = stringResource(id = title)) },
+                    title = { Text(
+                        text = stringResource(id = title),
+                        color = Color.White
+                    ) },
                     navigationIcon = {
                         IconButton(onClick = {
                             if (currentStep.value > 1) {
-                                currentStep.value -= 1 // Go back to the previous step
+                                currentStep.value -= 1
                             } else {
                                 navController.navigate("event_list")
                             }
                         }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(id = R.string.contentDescription_go_back)
+                                contentDescription = stringResource(id = R.string.contentDescription_go_back),
+                                tint= Color.White
                             )
                         }
                     }
@@ -77,6 +87,18 @@ import com.google.firebase.firestore.FirebaseFirestore
         }
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
+
+            Image(
+                painter = painterResource(id = R.drawable.eventorias777ff),
+                contentDescription = "App Icon",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(27f / 25f)
+            )
+
+            Spacer(modifier = Modifier.height(21.dp))
+
             when (currentStep.value) {
                 1 -> EmailInputScreen(
                     email = email.value,
@@ -144,7 +166,6 @@ import com.google.firebase.firestore.FirebaseFirestore
                                             }
                                         }
                                     } else {
-                                        // If creation fails, attempt to sign in for existing users
                                         FirebaseAuth.getInstance().signInWithEmailAndPassword(email.value, password.value)
                                             .addOnCompleteListener { signInTask ->
                                                 if (signInTask.isSuccessful) {

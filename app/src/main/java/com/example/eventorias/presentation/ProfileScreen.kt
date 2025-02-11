@@ -1,27 +1,36 @@
 package com.example.eventorias.presentation
 
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.eventorias.R
 import com.google.accompanist.permissions.rememberPermissionState
 import com.example.eventorias.presentation.notification.NotificationViewModel
+import com.example.eventorias.presentation.sign_in.GoogleAuthUiClient
 import com.example.eventorias.presentation.sign_in.Userdata
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,45 +38,47 @@ import org.koin.androidx.compose.koinViewModel
 fun ProfileScreen(
     onSignOut: () -> Unit,
     userdata: Userdata?,
+    googleAuthUiClient: GoogleAuthUiClient,
     viewModel: NotificationViewModel = koinViewModel()
 ) {
-    val auth = FirebaseAuth.getInstance()
-    val currentUser = auth.currentUser
     val context = LocalContext.current
-
-    val userData = remember { mutableStateOf<Userdata?>(null) }
+    val userDataState = remember { mutableStateOf(userdata) }
 
     LaunchedEffect(userdata?.userId) {
         userdata?.userId?.let { uid ->
             val firestore = FirebaseFirestore.getInstance()
             val userRef = firestore.collection("users").document(uid)
 
-            userRef.get()
-                .addOnSuccessListener { document ->
-                    if (document.exists()) {
-                        val firstName = document.getString("firstName") ?: "No Name"
-                        val lastName = document.getString("lastName") ?: "No Surname"
-                        val profilePictureUrl = document.getString("profilePictureUrl") ?: ""
-                        val photoUrl = document.getString("photoUrl") ?: ""
+            try {
+                val document = userRef.get().await()
+                if (document.exists()) {
+                    val firstName = document.getString("firstName") ?: "No Name"
+                    val lastName = document.getString("lastName") ?: "No Surname"
+                    val profilePictureUrl = document.getString("profilePictureUrl") ?: ""
+                    val photoUrl = document.getString("photoUrl") ?: ""
 
-                        val email = FirebaseAuth.getInstance().currentUser?.email ?: "No Email"
+                    val googleUser = googleAuthUiClient.getSignedInUser()
+                    val email = FirebaseAuth.getInstance().currentUser?.email ?: "No Email"
 
-                        userData.value = Userdata(
-                            userId = uid,
-                            userName = "$firstName $lastName",
-                            email = email,
-                            profilePictureUrl = profilePictureUrl,
-                            photoUrl = photoUrl
-                        )
-                    }
+                    userDataState.value = Userdata(
+                        userId = uid,
+                        userName =  "$firstName $lastName",
+                        email = email,
+                        profilePictureUrl =  profilePictureUrl,
+                        photoUrl =  photoUrl
+                    )
+                } else {
+                    userDataState.value = userdata // Fallback to passed userdata
                 }
-                .addOnFailureListener {
-                    Toast.makeText(context, "Failed to load user data", Toast.LENGTH_SHORT).show()
-                }
+            } catch (e: Exception) {
+                Toast.makeText(context, "Failed to load user data: ${e.message}", Toast.LENGTH_LONG).show()
+                userDataState.value = userdata // If fetching fails, use the passed userdata
+            }
         }
     }
 
-    if (userData.value == null) {
+    val userData = userDataState.value
+    if (userData == null) {
         Text("Loading user data...")
         return
     }
@@ -77,10 +88,37 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("User Profile", color = Color.White) }
+                title = {
+                    Text(
+                        "User Profile",
+                        color = Color.White
+                    )
+                },
+                actions = {
+                    if (!userdata?.profilePictureUrl.isNullOrEmpty()) {
+                        AsyncImage(
+                            model = userdata?.profilePictureUrl,
+                            contentDescription = "Profile picture",
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Default profile icon",
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape),
+                            tint = Color.White
+                        )
+                    }
+                }
             )
         }
-    ) { paddingValues ->
+
+    ){ paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -94,12 +132,12 @@ fun ProfileScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
-                    .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(8.dp))
                     .padding(16.dp)
             ) {
                 Column {
-                    Text(text = "Name", fontWeight = FontWeight.Bold, color = Color.White)
-                    Text(text = userData.value?.userName ?: "No Name", color = Color.White)
+                    Text(text = "Name", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                    Text(text = userData.userName, color = MaterialTheme.colorScheme.onSurface)
                 }
             }
 
@@ -109,12 +147,12 @@ fun ProfileScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
-                    .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(8.dp))
                     .padding(16.dp)
             ) {
                 Column {
-                    Text(text = "E-mail", fontWeight = FontWeight.Bold, color = Color.White)
-                    Text(text = userData.value?.email ?: "No Email", color = Color.White)
+                    Text(text = "E-mail", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                    Text(text = userData.email, color = MaterialTheme.colorScheme.onSurface)
                 }
             }
 
@@ -145,12 +183,11 @@ fun ProfileScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                 shape = RectangleShape,
             ) {
-                Text(text = "Sign out")
+                Text(text = "Sign out", color = Color.White)
             }
         }
     }
 }
-
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable

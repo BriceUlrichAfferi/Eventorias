@@ -83,7 +83,7 @@ fun SignInScreen(
             Box(
                 modifier = Modifier
                     .wrapContentSize(),
-                contentAlignment = androidx.compose.ui.Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
                 EmailSignInButton { onEmailSignInClick() }
             }
@@ -97,7 +97,7 @@ fun GoogleSignInButton(onClick: () -> Unit) {
     AndroidView(
         factory = { context: Context ->
             SignInButton(context).apply {
-                setSize(SignInButton.SIZE_WIDE) // Set button size
+                setSize(SignInButton.SIZE_WIDE)
                 setOnClickListener { onClick() }
             }
         },
@@ -119,12 +119,12 @@ fun EmailSignInButton(
         modifier = Modifier
             .width(200.dp)
             .height(50.dp),
-        shape = RectangleShape, // Ensure square edges
+        shape = RectangleShape,
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFFCC1305),
             contentColor = Color.White
         ),
-        contentPadding = PaddingValues(0.dp) // Remove internal padding
+        contentPadding = PaddingValues(0.dp)
     ) {
         Row(
             modifier = Modifier
@@ -133,7 +133,6 @@ fun EmailSignInButton(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            // Email Icon at the extreme left
             Icon(
                 imageVector = Icons.Filled.Email,
                 contentDescription = "Email Icon",
@@ -141,7 +140,6 @@ fun EmailSignInButton(
                 modifier = Modifier.size(24.dp)
             )
 
-            // Small gap between icon and text
             Spacer(modifier = Modifier.width(8.dp))
 
             Box(
