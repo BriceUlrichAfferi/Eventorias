@@ -2,34 +2,15 @@ package com.example.eventorias.presentation.botomNavigation.email_log_in
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,37 +31,34 @@ import com.google.firebase.auth.FirebaseAuth
 fun LoginScreen(
     navController: NavController
 ) {
-    val email = rememberSaveable { mutableStateOf("") }
-    val password = rememberSaveable { mutableStateOf("") }
-    val emailError = rememberSaveable { mutableStateOf<String?>(null) }
-    val passwordError =rememberSaveable { mutableStateOf<String?>(null) }
-    val currentStep = rememberSaveable { mutableStateOf(1) }
+    val email = remember { mutableStateOf("") }
+    val password = remember { mutableStateOf("") }
+    // Change to String? to match Text function expected types
+    val emailError = remember { mutableStateOf<String?>(null) }
+    val passwordError = remember { mutableStateOf<String?>(null) }
+    val currentStep = remember { mutableStateOf(1) }
     val auth = FirebaseAuth.getInstance()
-    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    var passwordVisible by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(
-                    text = stringResource(id = R.string.sign_in),
-                    color = Color.White
-                ) },
+                title = { Text(text = stringResource(id = R.string.sign_in), color = Color.White) },
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                        if (currentStep.value > 1) {
-                            currentStep.value -= 1
-                        } else {
-                            navController.navigate("email_sign_in")
-
+                            if (currentStep.value > 1) {
+                                currentStep.value -= 1
+                            } else {
+                                navController.navigate("email_sign_in")
+                            }
                         }
-                    }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(id = R.string.contentDescription_go_back),
-                            tint= Color.White
-
+                            tint = Color.White
                         )
                     }
                 }
@@ -90,7 +68,8 @@ fun LoginScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(padding)
+                .verticalScroll(scrollState),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -144,7 +123,6 @@ fun LoginScreen(
 
             // Step 2: Password input
             if (currentStep.value == 2) {
-
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Password input with visibility toggle
@@ -159,9 +137,7 @@ fun LoginScreen(
                         val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
                         val description = if (passwordVisible) "Hide password" else "Show password"
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(imageVector = image,
-                                contentDescription = description,
-                                tint = Color.Black)
+                            Icon(imageVector = image, contentDescription = description, tint = Color.Black)
                         }
                     }
                 )
@@ -174,7 +150,6 @@ fun LoginScreen(
                 // Sign In button
                 Button(
                     onClick = {
-                        // Validate email and password
                         passwordError.value = if (password.value.isBlank()) "Password cannot be empty" else null
 
                         if (emailError.value == null && passwordError.value == null) {
@@ -182,10 +157,8 @@ fun LoginScreen(
                                 .addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
                                         navController.navigate("event_list") {
-                                            popUpTo(0) { inclusive = true } // Clears the entire back stack
+                                            popUpTo(0) { inclusive = true }
                                         }
-
-
                                         Toast.makeText(navController.context, "Sign in successful", Toast.LENGTH_SHORT).show()
                                     } else {
                                         Toast.makeText(navController.context, "Authentication failed", Toast.LENGTH_SHORT).show()
@@ -205,10 +178,8 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Forgot Password clickable text
-                TextButton(onClick = {
-                    navController.navigate("password_recovery")
-                }) {
+                // Forgot Password clickable TextButton
+                TextButton(onClick = { navController.navigate("password_recovery") }) {
                     Text("Trouble signing in?", color = Color.White)
                 }
             }

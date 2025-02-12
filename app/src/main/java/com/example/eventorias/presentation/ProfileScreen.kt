@@ -5,8 +5,10 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
@@ -23,11 +25,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.eventorias.R
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.example.eventorias.presentation.notification.NotificationViewModel
 import com.example.eventorias.presentation.sign_in.GoogleAuthUiClient
 import com.example.eventorias.presentation.sign_in.Userdata
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -117,12 +119,14 @@ fun ProfileScreen(
                 }
             )
         }
+    ) { paddingValues ->
+        val scrollState = rememberScrollState()
 
-    ){ paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .padding(paddingValues)
+                .verticalScroll(scrollState),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

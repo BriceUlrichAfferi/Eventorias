@@ -38,12 +38,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.eventorias.R
 import com.example.eventorias.model.Event
-import java.time.format.DateTimeFormatter
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.eventorias.presentation.sign_in.Userdata
 import kotlinx.coroutines.delay
-
+import org.threeten.bp.LocalDate
+import org.threeten.bp.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventListScreen(
@@ -59,7 +59,6 @@ fun EventListScreen(
     var searchQuery by remember { mutableStateOf("") }
     var sortOption by remember { mutableStateOf("date") }
     var isSearchExpanded by remember { mutableStateOf(false) }
-
 
     Scaffold(
         topBar = {
@@ -79,16 +78,11 @@ fun EventListScreen(
                             TextField(
                                 value = searchQuery,
                                 onValueChange = { searchQuery = it },
-                                placeholder = { Text(
-                                    "Search events",
-                                    color = Color.White
-                                ) },
+                                placeholder = { Text("Search events (ex:'2023-05-01' for date)", color = Color.White) },
                                 modifier = Modifier
                                     .weight(1f)
                                     .padding(start = 16.dp),
-                                keyboardOptions = KeyboardOptions.Default.copy(
-                                    imeAction = ImeAction.Search
-                                ),
+                                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
                                 keyboardActions = KeyboardActions(
                                     onSearch = {
                                         Toast.makeText(context, "Searching for $searchQuery", Toast.LENGTH_SHORT).show()
@@ -189,9 +183,17 @@ fun EventListScreen(
 
                 else -> {
                     LazyColumn {
-                        items(events.filter {
-                            it.title.contains(searchQuery, ignoreCase = true) ||
-                                    it.description.contains(searchQuery, ignoreCase = true)
+                        items(events.filter { event ->
+                            // Check if search query matches title, description, category, or date
+                            val datePattern = Regex("^\\d{4}-\\d{2}-\\d{2}$")
+                            if (datePattern.matches(searchQuery)) {
+                                val queryDate = LocalDate.parse(searchQuery)
+                                event.date == queryDate
+                            } else {
+                                event.title.contains(searchQuery, ignoreCase = true) ||
+                                        event.description.contains(searchQuery, ignoreCase = true) ||
+                                        event.category.contains(searchQuery, ignoreCase = true)
+                            }
                         }) { event ->
                             EventItem(
                                 event = event,
@@ -352,5 +354,3 @@ fun EventItem(event: Event, user: Userdata, onEventClick: (Event) -> Unit) {
         }
     }
 }
-
-

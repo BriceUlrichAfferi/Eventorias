@@ -10,6 +10,10 @@ class EventoriaApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        // Initialize ThreeTenABP for Java 8's time API on Android
+        //AndroidThreeTen.init(this)
+
+        // Start Koin
         startKoin {
             androidLogger()
             androidContext(this@EventoriaApplication)

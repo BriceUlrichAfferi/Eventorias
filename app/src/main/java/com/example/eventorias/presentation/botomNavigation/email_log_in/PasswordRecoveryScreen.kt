@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -18,6 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,9 +31,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -42,7 +48,7 @@ import com.google.firebase.auth.FirebaseAuth
 fun PasswordRecoveryScreen(
     navController: NavController
 ) {
-    val email = rememberSaveable { mutableStateOf(TextFieldValue("")) }
+    val email = remember{ mutableStateOf(TextFieldValue("")) }
     val emailError = rememberSaveable { mutableStateOf<String?>(null) }
     val auth = FirebaseAuth.getInstance()
     var showDialog by remember { mutableStateOf(false) }
@@ -80,7 +86,8 @@ fun PasswordRecoveryScreen(
                 text = stringResource(id = R.string.password_recovery_label),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = Color.White,
+                textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -93,6 +100,22 @@ fun PasswordRecoveryScreen(
                     color = Color.White
 
                 ) },
+
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    disabledTextColor = Color.Gray,
+                    errorTextColor = Color.Red,
+                    focusedIndicatorColor = Color.White,
+                    unfocusedIndicatorColor = Color.White,
+                    errorIndicatorColor = Color.White,
+                    focusedLabelColor = Color.White,
+                    unfocusedLabelColor = Color.White,
+                    focusedContainerColor = colorResource(id = R.color.grey_pro),
+                    unfocusedContainerColor = colorResource(id = R.color.grey_pro),
+                    disabledContainerColor = Color.LightGray,
+                    errorContainerColor = Color.White
+                ),
                 isError = emailError.value != null,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -124,7 +147,12 @@ fun PasswordRecoveryScreen(
                             }
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .padding(16.dp, bottom = 16.dp)
+                    .width(200.dp)
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                shape = RectangleShape
             ) {
                 Text("Send Reset Email", color = Color.White)
             }

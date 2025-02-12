@@ -101,17 +101,5 @@ class EventRepository(private val firestore: FirebaseFirestore) {
             Event.fromFirestore(it)
         }
 
-    /**
-     * Updates an existing event in Firestore.
-     */
-    suspend fun updateEvent(eventId: String, event: Event) {
-        firestore.collection("events").document(eventId).set(Event.toFirestore(event)).await()
-    }
 
-    /**
-     * Deletes an event from Firestore.
-     */
-    suspend fun deleteEvent(eventId: String) {
-        firestore.collection("events").document(eventId).delete().await()
-    }
 }

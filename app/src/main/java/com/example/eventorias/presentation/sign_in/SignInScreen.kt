@@ -3,26 +3,11 @@ package com.example.eventorias.presentation.sign_in
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,10 +35,15 @@ fun SignInScreen(
         }
     }
 
-    Box(
+    val scrollState = rememberScrollState()
+
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(50.dp)
+            .verticalScroll(scrollState),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Image(
             painter = painterResource(id = R.drawable.eventorias777ff),
@@ -64,33 +54,15 @@ fun SignInScreen(
                 .aspectRatio(16f / 25f)
         )
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .wrapContentSize()
-                    .padding(bottom = 16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                GoogleSignInButton { onGoogleSignInClick() }
-            }
+        Spacer(modifier = Modifier.height(16.dp))
 
-            Box(
-                modifier = Modifier
-                    .wrapContentSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                EmailSignInButton { onEmailSignInClick() }
-            }
-        }
+        GoogleSignInButton { onGoogleSignInClick() }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        EmailSignInButton { onEmailSignInClick() }
     }
 }
-
 
 @Composable
 fun GoogleSignInButton(onClick: () -> Unit) {
@@ -107,8 +79,6 @@ fun GoogleSignInButton(onClick: () -> Unit) {
             .padding(horizontal = 16.dp)
     )
 }
-
-
 
 @Composable
 fun EmailSignInButton(

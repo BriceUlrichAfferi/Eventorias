@@ -11,28 +11,30 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.eventorias.R
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import androidx.compose.material.icons.filled.AttachFile
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
-import com.google.firebase.auth.FirebaseAuth
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,11 +49,12 @@ fun EventScreen(
     val auth = FirebaseAuth.getInstance()
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+    var category by remember { mutableStateOf("") }
     var date by remember { mutableStateOf("") }
     var time by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    var saveError by remember { mutableStateOf<String?>(null) }
+    var imageUri by remember { mutableStateOf<Uri?>(null) } // Changed from null to Uri?
+    var saveError by remember { mutableStateOf<String?>(null) } // Changed from null to String?
 
     // Prepare the camera launcher for Android 13+
     val pickImageLauncherFor13Plus = rememberLauncherForActivityResult(
@@ -69,7 +72,7 @@ fun EventScreen(
         }
     }
 
-    // File picker launcher for older versions (if needed)
+    // File picker launcher for older versions
     val pickImageLauncherForOlder = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri -> imageUri = uri }
@@ -96,6 +99,8 @@ fun EventScreen(
             )
         }
     ) { contentPadding ->
+        val scrollState = rememberScrollState()
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -104,7 +109,8 @@ fun EventScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 // Title
@@ -129,6 +135,21 @@ fun EventScreen(
                     onValueChange = { description = it },
                     label = { Text("Description", style = MaterialTheme.typography.titleSmall) },
                     placeholder = { Text("Enter event description", style = MaterialTheme.typography.titleMedium) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = colorResource(id = R.color.grey_pro),
+                        focusedContainerColor = Color.White,
+                        unfocusedLabelColor = Color.White,
+                        focusedLabelColor = Color.Red
+                    )
+                )
+
+                // Category
+                OutlinedTextField(
+                    value = category,
+                    onValueChange = { category = it },
+                    label = { Text("Category", style = MaterialTheme.typography.titleSmall) },
+                    placeholder = { Text("Enter event category", style = MaterialTheme.typography.titleMedium) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.colors(
                         unfocusedContainerColor = colorResource(id = R.color.grey_pro),
@@ -196,14 +217,12 @@ fun EventScreen(
                         .wrapContentWidth(Alignment.CenterHorizontally)
                         .padding(24.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(24.dp),
-
+                    horizontalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-
                     // Camera Button
                     Button(
                         onClick = {
-                            val photoUri = createImageUri(context) // Method to create a URI for storing the captured image
+                            val photoUri = createImageUri(context)
                             imageUri = photoUri
                             takePictureLauncher.launch(photoUri)
                         },
@@ -241,11 +260,8 @@ fun EventScreen(
                 }
             }
 
-
-
             Button(
                 onClick = {
-                    // Check if the user is logged in
                     val currentUser = auth.currentUser
                     if (currentUser == null) {
                         Toast.makeText(context, "You must be logged in to save the event.", Toast.LENGTH_SHORT).show()
@@ -253,11 +269,12 @@ fun EventScreen(
                         saveEventToFirestore(
                             title = title,
                             description = description,
+                            category = category,
                             date = date,
                             time = time,
                             location = location,
                             imageUri = imageUri,
-                            userProfileUrl = currentUser.photoUrl?.toString(), // Get user's profile URL
+                            userProfileUrl = currentUser.photoUrl?.toString(),
                             onComplete = { success, errorMessage ->
                                 if (success) {
                                     saveError = null
@@ -281,7 +298,8 @@ fun EventScreen(
                     stringResource(id = R.string.action_valider),
                     style = TextStyle(color = Color.White),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp)
+                    fontSize = 18.sp
+                )
             }
 
             // Display error if any
@@ -291,7 +309,7 @@ fun EventScreen(
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .padding(bottom = 80.dp) // Pushes above the button
+                        .padding(bottom = 80.dp)
                 )
             }
         }
@@ -307,11 +325,10 @@ fun createImageUri(context: Context): Uri {
     return context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)!!
 }
 
-
-
 fun saveEventToFirestore(
     title: String,
     description: String,
+    category: String,
     date: String,
     time: String,
     location: String,
@@ -329,6 +346,7 @@ fun saveEventToFirestore(
         "id" to eventId,
         "title" to title,
         "description" to description,
+        "category" to category,
         "date" to date,
         "time" to time,
         "location" to location

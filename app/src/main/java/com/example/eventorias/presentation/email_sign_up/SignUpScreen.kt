@@ -3,23 +3,15 @@ package com.example.eventorias.presentation.email_sign_up
 import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -34,25 +26,21 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
- fun SignUpScreen(
+fun SignUpScreen(
     onLoginSuccess: () -> Unit,
     navController: NavController
-    ) {
+) {
     val context = LocalContext.current
     val email = rememberSaveable { mutableStateOf("") }
     val name = rememberSaveable { mutableStateOf("") }
     val surname = rememberSaveable { mutableStateOf("") }
     val emailError = rememberSaveable { mutableStateOf<String?>(null) }
-
-
     val currentStep = rememberSaveable { mutableStateOf(1) }
-
-    // Sign-in state variables
     val password = rememberSaveable { mutableStateOf("") }
     val passwordError = rememberSaveable { mutableStateOf<String?>(null) }
-
     val auth = FirebaseAuth.getInstance()
 
+    val scrollState = rememberScrollState()
 
     Scaffold(
         topBar = {
@@ -63,22 +51,19 @@ import com.google.firebase.firestore.FirebaseFirestore
                     else -> R.string.sign_up
                 }
                 TopAppBar(
-                    title = { Text(
-                        text = stringResource(id = title),
-                        color = Color.White
-                    ) },
+                    title = { Text(text = stringResource(id = title), color = Color.White) },
                     navigationIcon = {
                         IconButton(onClick = {
                             if (currentStep.value > 1) {
                                 currentStep.value -= 1
                             } else {
-                                navController.navigate("event_list")
+                                navController.navigate("sign_in")
                             }
                         }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = stringResource(id = R.string.contentDescription_go_back),
-                                tint= Color.White
+                                tint = Color.White
                             )
                         }
                     }
@@ -86,8 +71,14 @@ import com.google.firebase.firestore.FirebaseFirestore
             }
         }
     ) { padding ->
-        Box(modifier = Modifier.padding(padding)) {
-
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .verticalScroll(scrollState),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Image(
                 painter = painterResource(id = R.drawable.eventorias777ff),
                 contentDescription = "App Icon",
@@ -177,7 +168,6 @@ import com.google.firebase.firestore.FirebaseFirestore
                                             }
                                     }
                                 }
-
                         }
                     }
                 )
@@ -185,5 +175,3 @@ import com.google.firebase.firestore.FirebaseFirestore
         }
     }
 }
-
-

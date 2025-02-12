@@ -46,25 +46,23 @@ class EventViewModel : ViewModel(), KoinComponent {
     }
 
     /** Fetches events sorted by a given option */
+    /** Fetches events sorted by a given option */
     fun fetchEventsBySortOption(sortOption: String) {
-        _loadingState.value = true  // Start loading
         viewModelScope.launch {
             try {
                 when (sortOption) {
                     "date" -> repository.getEventsRealtimeSortedByDate().collect { events ->
                         _events.value = events
                     }
-
                     "category" -> repository.getEventsRealtimeSortedByCategory().collect { events ->
                         _events.value = events
                     }
-
-                    else -> fetchEvents()
+                    else -> repository.getEventsRealtime().collect { events ->
+                        _events.value = events
+                    }
                 }
             } catch (e: Exception) {
-                _error.value = "Error fetching events"
-            } finally {
-                _loadingState.value = false
+                _error.value = "Error fetching sorted events: ${e.message}"
             }
         }
     }

@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.eventorias"
-        minSdk = 26
+        minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -107,11 +107,32 @@ dependencies {
     //okhttp Dependency
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
+// Dependency for modern date and time API from Java 8 to older Android versions
+    //implementation("com.jakewharton.threetenabp:threetenabp:1.4.8")
+    implementation ("org.threeten:threetenbp:1.5.1")
+    //implementation ("org.threeten:threetenbp:1.5.1:no-tzdb") // Optional if time-zone database is not needed
 
+    // Unit testing
+    testImplementation("junit:junit:4.13.2")
+    //testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
 
-    // Firebase dependencies for testing
+    //testImplementation("org.mockito:mockito-core:4.11.0")
+    testImplementation ("org.mockito:mockito-core:4.5.1")
+
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
+    testImplementation("org.mockito:mockito-inline:4.11.0")
+    testImplementation ("com.google.firebase:firebase-firestore:24.0.0 ")
+
+    testImplementation ("androidx.arch.core:core-testing:2.1.0")
+    testImplementation("org.mockito:mockito-inline:4.0.0")
+
+    testImplementation("io.insert-koin:koin-test:3.2.0")
+// Firebase dependencies for testing
     testImplementation ("com.google.firebase:firebase-auth:21.0.7")
     testImplementation ("io.mockk:mockk:1.12.0")
+
+    testImplementation("com.jakewharton.threetenabp:threetenabp:1.4.8")
 
 
     testImplementation(libs.junit)
@@ -121,4 +142,11 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    // JUnit 5 requires this for the platform launcher
+    testImplementation("org.junit.platform:junit-platform-launcher:1.9.1")
 }
+
+/*// Enable JUnit Platform for JUnit 5
+tasks.withType<Test> {
+    useJUnitPlatform()
+}*/
