@@ -30,7 +30,6 @@ import com.example.eventorias.model.Event
 import com.example.eventorias.presentation.ProfileScreen
 import com.example.eventorias.presentation.event.EventDetailsScreen
 import com.example.eventorias.presentation.event.EventListScreen
-import com.example.eventorias.presentation.event.EventScreen
 import com.example.eventorias.presentation.sign_in.EmailAuthClient
 import com.example.eventorias.presentation.sign_in.EmailSignInScreen
 import com.example.eventorias.presentation.sign_in.GoogleAuthUiClient
@@ -44,6 +43,7 @@ import com.example.eventorias.presentation.botomNavigation.EventoriasBottomNavig
 import com.example.eventorias.presentation.botomNavigation.email_log_in.LoginScreen
 import com.example.eventorias.presentation.botomNavigation.email_log_in.PasswordRecoveryScreen
 import com.example.eventorias.presentation.email_sign_up.SignUpScreen
+import com.example.eventorias.presentation.event.CreateEventScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -140,7 +140,6 @@ class MainActivity : ComponentActivity() {
                                 LaunchedEffect(key1 = Unit) {
                                     val intentSender = googleAuthUiClient.signIn()
                                     if (intentSender != null) {
-                                        Log.d("SignIn", "Launching Google Sign-In")
                                         googleSignInLauncher.launch(
                                             IntentSenderRequest.Builder(intentSender).build()
                                         )
@@ -195,7 +194,7 @@ class MainActivity : ComponentActivity() {
                             // Route for EventScreen
                             composable("create_event") {
                                 val context = LocalContext.current
-                                EventScreen(
+                                CreateEventScreen(
                                     onBackClick = { navController.popBackStack() },
                                     onSaveClick = {
                                         Toast.makeText(

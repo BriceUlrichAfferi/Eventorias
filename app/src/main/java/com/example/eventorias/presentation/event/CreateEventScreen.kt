@@ -39,7 +39,7 @@ import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventScreen(
+fun CreateEventScreen(
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit
@@ -53,8 +53,8 @@ fun EventScreen(
     var date by remember { mutableStateOf("") }
     var time by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
-    var imageUri by remember { mutableStateOf<Uri?>(null) } // Changed from null to Uri?
-    var saveError by remember { mutableStateOf<String?>(null) } // Changed from null to String?
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var saveError by remember { mutableStateOf<String?>(null) }
 
     // Prepare the camera launcher for Android 13+
     val pickImageLauncherFor13Plus = rememberLauncherForActivityResult(
@@ -316,7 +316,6 @@ fun EventScreen(
     }
 }
 
-// Helper method to create a URI for storing the captured image
 fun createImageUri(context: Context): Uri {
     val contentValues = ContentValues().apply {
         put(MediaStore.Images.Media.DISPLAY_NAME, "event_image.jpg")
@@ -364,11 +363,9 @@ fun saveEventToFirestore(
                     firestore.collection("events").document(eventId)
                         .set(eventData)
                         .addOnSuccessListener {
-                            Log.d("Firestore", "Event saved with ID: $eventId")
                             onComplete(true, null)
                         }
                         .addOnFailureListener { e ->
-                            Log.e("Firestore", "Failed to save event: ${e.message}")
                             onComplete(false, e.message)
                         }
                 }
