@@ -1,5 +1,6 @@
 package com.example.eventorias.presentation.event
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.eventorias.model.Event
@@ -9,6 +10,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.Date
 
 class EventViewModel : ViewModel(), KoinComponent {
 
@@ -26,7 +28,7 @@ class EventViewModel : ViewModel(), KoinComponent {
     private val _loadingState = MutableStateFlow(false)
 
     init {
-        fetchEvents()
+        fetchEventsBySortOption("createdAt")
     }
 
     /** Fetches all events in real-time */
@@ -57,6 +59,10 @@ class EventViewModel : ViewModel(), KoinComponent {
                     "category" -> repository.getEventsRealtimeSortedByCategory().collect { events ->
                         _events.value = events
                     }
+                    "createdAt" -> repository.getEventsRealtimeSortedByTimeCreated().collect{ events ->
+                        _events.value = events
+                    }
+
                     else -> repository.getEventsRealtime().collect { events ->
                         _events.value = events
                     }

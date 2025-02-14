@@ -6,12 +6,15 @@ import com.google.firebase.firestore.DocumentSnapshot
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter
+import java.text.SimpleDateFormat
+import java.util.Date
 
 data class Event(
     val id: String = "",
     val title: String = "",
     val description: String = "",
     val date: LocalDate = LocalDate.now(),
+    val createdAt: Any = Date(),
     val time: LocalTime = LocalTime.now(),
     val location: String = "",
     val category: String = "",
@@ -23,7 +26,6 @@ data class Event(
         // Fetch from Firestore
         fun fromFirestore(document: DocumentSnapshot): Event? {
             val map = document.data ?: return null
-
             return Event(
                 id = document.id,
                 title = map["title"] as? String ?: "",
@@ -35,12 +37,25 @@ data class Event(
                     LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME)
                 } ?: LocalTime.of(0, 0),
                 location = map["location"] as? String ?: "",
+                createdAt = when (val createdAt = map["createdAt"]) {
+                    is Timestamp -> createdAt.toDate()
+                    is Date -> createdAt
+                    is String -> {
+                        try {
+                            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(createdAt)
+                        } catch (e: Exception) {
+                            Date()
+                        }
+                    }
+                    else -> Date() // Default to current date if type is unrecognized
+                },
                 category = map["category"] as? String ?: "",
                 photoUrl = map["photoUrl"] as? String,
                 userProfileUrl = map["userProfileUrl"] as? String
             ).also {
                 Log.d("Event", "Parsed Event: $it")
             }
+
         }
 
         // Store to Firestore
@@ -49,8 +64,9 @@ data class Event(
                 "id" to event.id,
                 "title" to event.title,
                 "description" to event.description,
-                "date" to event.date.format(DateTimeFormatter.ISO_LOCAL_DATE), // Store date as string in ISO format
-                "time" to event.time.format(DateTimeFormatter.ISO_LOCAL_TIME), // Store time as string in ISO format
+                "date" to event.date.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                "time" to event.time.format(DateTimeFormatter.ISO_LOCAL_TIME),
+                "createdAt" to event.createdAt,
                 "location" to event.location,
                 "category" to event.category,
                 "photoUrl" to (event.photoUrl ?: ""),

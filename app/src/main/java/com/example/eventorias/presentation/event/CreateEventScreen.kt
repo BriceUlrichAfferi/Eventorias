@@ -3,27 +3,29 @@ package com.example.eventorias.presentation.event
 import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -31,11 +33,17 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.eventorias.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import java.util.Date
 import java.util.UUID
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import androidx.compose.foundation.clickable
+import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +52,6 @@ fun CreateEventScreen(
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit
 ) {
-
     val context = LocalContext.current
     val auth = FirebaseAuth.getInstance()
     var title by remember { mutableStateOf("") }
@@ -56,26 +63,19 @@ fun CreateEventScreen(
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var saveError by remember { mutableStateOf<String?>(null) }
 
-    // Prepare the camera launcher for Android 13+
-    val pickImageLauncherFor13Plus = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
+    // File picker launcher
+    val pickImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
     ) { uri -> imageUri = uri }
 
-    // Prepare the camera launcher for older versions (below Android 13)
+    // Camera launcher
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
-        if (success) {
-            imageUri?.let {
-
-            }
+        if (success) {// Redirect to gallery to pick an image
+            pickImageLauncher.launch("image/*")
         }
     }
-
-    // File picker launcher for older versions
-    val pickImageLauncherForOlder = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri -> imageUri = uri }
 
     Scaffold(
         modifier = modifier,
@@ -168,10 +168,32 @@ fun CreateEventScreen(
                     OutlinedTextField(
                         value = date,
                         onValueChange = { date = it },
-                        label = { Text("Date", style = MaterialTheme.typography.titleSmall) },
+                        label = { Text("Date",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = Color.Black
+                        ) },
                         placeholder = { Text("YYYY-MM-DD", style = MaterialTheme.typography.titleMedium) },
                         singleLine = true,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f)
+                            .clickable {
+                                // Show DatePickerDialog
+                                val calendar = Calendar.getInstance()
+                                val year = calendar.get(Calendar.YEAR)
+                                val month = calendar.get(Calendar.MONTH)
+                                val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+                                DatePickerDialog(
+                                    context,
+                                    { _, selectedYear, selectedMonth, selectedDay ->
+                                        // Update the date with the selected value
+                                        date = String.format("%04d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay)
+                                    },
+                                    year,
+                                    month,
+                                    day
+                                ).show()
+                            },
+                        enabled = false, // Prevent manual editing
                         colors = TextFieldDefaults.colors(
                             unfocusedContainerColor = colorResource(id = R.color.grey_pro),
                             focusedContainerColor = Color.White,
@@ -186,7 +208,24 @@ fun CreateEventScreen(
                         label = { Text("Time", style = MaterialTheme.typography.titleSmall) },
                         placeholder = { Text("HH:MM", style = MaterialTheme.typography.titleMedium) },
                         singleLine = true,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f)
+                            .clickable{
+                                // Show TimePickerDialog
+                                val calendar = Calendar.getInstance()
+                                val hour = calendar.get(Calendar.HOUR_OF_DAY)
+                                val minute = calendar.get(Calendar.MINUTE)
+
+                                TimePickerDialog(
+                                    context,
+                                    { _, selectedHour, selectedMinute ->
+                                        time = String.format("%02d:%02d", selectedHour, selectedMinute)
+                                    },
+                                    hour,
+                                    minute,
+                                    true // Use 24-hour format
+                                ).show()
+                            },
+                        enabled = false, // Prevent manual editing
                         colors = TextFieldDefaults.colors(
                             unfocusedContainerColor = colorResource(id = R.color.grey_pro),
                             focusedContainerColor = Color.White,
@@ -213,7 +252,8 @@ fun CreateEventScreen(
                 )
 
                 Row(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .wrapContentWidth(Alignment.CenterHorizontally)
                         .padding(24.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -240,12 +280,7 @@ fun CreateEventScreen(
                     // Attach File Button
                     Button(
                         onClick = {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                val pickRequest = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                                pickImageLauncherFor13Plus.launch(pickRequest)
-                            } else {
-                                pickImageLauncherForOlder.launch("image/*")
-                            }
+                            pickImageLauncher.launch("image/*")
                         },
                         modifier = Modifier.size(70.dp),
                         shape = RoundedCornerShape(18.dp),
@@ -258,6 +293,44 @@ fun CreateEventScreen(
                         )
                     }
                 }
+
+                // Display the selected or captured image with remove option
+                imageUri?.let { uri ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .padding(16.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(color = Color.Gray.copy(alpha = 0.2f))
+                    ) {
+                        AsyncImage(
+                            model = uri,
+                            contentDescription = "Selected Image",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+
+                        // Cancel button to remove the selected image
+                        IconButton(
+                            onClick = {
+                                imageUri = null
+                            },
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.error)
+                                .size(36.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Remove",
+                                tint = Color.White
+                            )
+                        }
+                    }
+                }
+
             }
 
             Button(
@@ -329,6 +402,7 @@ fun saveEventToFirestore(
     description: String,
     category: String,
     date: String,
+    createdAt: Any = Date(),
     time: String,
     location: String,
     imageUri: Uri?,
@@ -347,6 +421,7 @@ fun saveEventToFirestore(
         "description" to description,
         "category" to category,
         "date" to date,
+        "createdAt" to createdAt,
         "time" to time,
         "location" to location
     )
