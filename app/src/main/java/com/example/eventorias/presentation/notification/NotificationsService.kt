@@ -16,18 +16,12 @@ class NotificationsService : FirebaseMessagingService() {
         super.onMessageReceived(remoteMessage)
 
         if (!areNotificationsEnabled()) {
-            Log.d("FCM Message", "Notifications are disabled, ignoring message.")
             return
         }
-
-        Log.d("FCM Message", "From: ${remoteMessage.from}")
-
         remoteMessage.data.isNotEmpty().let {
-            Log.d("FCM Data", remoteMessage.data.toString())
         }
 
         remoteMessage.notification?.let {
-            Log.d("FCM Notification", "Title: ${it.title}, Body: ${it.body}")
             sendNotification(it.title ?: "New Notification", it.body)
         }
     }

@@ -1,6 +1,7 @@
 package com.example.eventorias.presentation.event
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -152,7 +153,7 @@ fun EventListScreen(
         modifier = modifier,
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
-            if (errorMessage == null) { // Hide FAB when error is present
+            if (errorMessage == null && events.isNotEmpty()) { // Hide FAB when error is present
                 FloatingActionButton(
                     onClick = onFABClick,
                     modifier = Modifier,
@@ -195,6 +196,7 @@ fun EventListScreen(
                                         event.category.contains(searchQuery, ignoreCase = true)
                             }
                         }) { event ->
+                            Log.d("EventListScreen", "Displaying event: ${event.title}, Date: ${event.date}, CreatedAt: ${event.createdAt}")
                             EventItem(
                                 event = event,
                                 user = users[event.id] ?: Userdata("", "", "", null, null),

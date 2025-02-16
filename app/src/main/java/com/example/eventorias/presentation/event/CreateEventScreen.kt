@@ -3,9 +3,12 @@ package com.example.eventorias.presentation.event
 import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -72,8 +75,8 @@ fun CreateEventScreen(
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
-        if (success) {// Redirect to gallery to pick an image
-            pickImageLauncher.launch("image/*")
+        if (success) {
+            pickImageLauncher.launch("image/*") // Redirect to gallery to pick an image
         }
     }
 
@@ -294,6 +297,7 @@ fun CreateEventScreen(
                     }
                 }
 
+                // Display the selected or captured image
                 // Display the selected or captured image with remove option
                 imageUri?.let { uri ->
                     Box(
@@ -314,7 +318,7 @@ fun CreateEventScreen(
                         // Cancel button to remove the selected image
                         IconButton(
                             onClick = {
-                                imageUri = null
+                                imageUri = null // Clear the selected image
                             },
                             modifier = Modifier
                                 .align(Alignment.TopEnd)

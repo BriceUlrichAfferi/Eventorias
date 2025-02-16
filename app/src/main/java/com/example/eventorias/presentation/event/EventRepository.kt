@@ -1,6 +1,7 @@
 package com.example.eventorias.presentation.event
 
 
+import android.util.Log
 import com.example.eventorias.model.Event
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import com.google.firebase.firestore.FieldValue
+import java.util.Date
 
 class EventRepository(private val firestore: FirebaseFirestore) {
 

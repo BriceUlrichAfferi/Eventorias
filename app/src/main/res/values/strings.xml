@@ -14,7 +14,7 @@
     <string name="no_description">Description not available</string>
     <string name="no_profilePic">No profile image</string>
     <string name="error_occured">An error occurred,\nplease try again later</string>
-    <string name="error">Erreur </string>
+    <string name="error">Error </string>
     <string name="bottom_navigation_events">Events</string>
     <string name="bottom_navigation_profile">Profile</string>
     <string name="sign_up">Sign up</string>

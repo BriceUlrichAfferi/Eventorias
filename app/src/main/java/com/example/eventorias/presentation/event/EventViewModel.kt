@@ -38,6 +38,7 @@ class EventViewModel : ViewModel(), KoinComponent {
             try {
                 repository.getEventsRealtime().collect { events ->
                     _events.value = events
+                    Log.d("EventViewModel", "Fetched unsorted events: ${events.map { it.id }}")
                 }
             } catch (e: Exception) {
                 _error.value = "An error occurred,\nplease try again later"
