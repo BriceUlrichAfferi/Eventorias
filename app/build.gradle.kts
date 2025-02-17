@@ -1,7 +1,11 @@
+import com.android.build.gradle.BaseExtension
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.gms.google-services")
+    id("jacoco")
+    id("org.sonarqube") version "4.4.1.3373" // Added SonarQube plugin
 }
 
 android {
@@ -30,13 +34,19 @@ android {
             isShrinkResources = true
 
             proguardFiles(
-                 // R8 configuration files.
+                // R8 configuration files.
                 getDefaultProguardFile("proguard-android-optimize.txt"),
 
                 // local, custom Proguard rules file
                 "proguard-rules.pro"
             )
         }
+
+        debug {
+            enableAndroidTestCoverage = true
+            enableUnitTestCoverage = true
+        }
+
     }
 
     compileOptions {
@@ -60,6 +70,37 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+}
+
+val androidExtension = extensions.getByType<BaseExtension>()
+
+val jacocoTestReport by tasks.registering(JacocoReport::class) {
+    dependsOn("testDebugUnitTest", "createDebugCoverageReport")
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports"
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val debugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug")
+    val mainSrc = androidExtension.sourceSets.getByName("main").java.srcDirs
+
+    classDirectories.setFrom(debugTree)
+    sourceDirectories.setFrom(files(mainSrc))
+    executionData.setFrom(fileTree(buildDir) {
+        include("**/*.exec", "**/*.ec")
+    })
+}
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "com.example.eventorias")
+        property("sonar.organization", "briceulrichafferi")
+        property("sonar.host.url", "https://sonarcloud.io")
+        // Add more properties as needed for your SonarQube configuration
     }
 }
 
