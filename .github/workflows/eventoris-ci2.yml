@@ -2,7 +2,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [ main ] # or whatever your primary branch is named
+    branches: [ main ]
 
 jobs:
   build:
@@ -25,7 +25,13 @@ jobs:
       run: ./gradlew test
 
     - name: Run Instrumented Tests
-      run: ./gradlew connectedAndroidTest
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 30
+        target: "google_apis"
+        arch: "x86_64"
+        avd-name: "Pixel_8_API_30"
+        script: ./gradlew connectedAndroidTest
 
     - name: Build and Analyze with SonarCloud
       env:
