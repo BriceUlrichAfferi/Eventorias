@@ -23,4 +23,4 @@ jobs:
         appId: ${{ secrets.FIREBASE_APP_ID }}
         serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
         groups: testers # Change this to your group name in Firebase
-        file: app/build/outputs/apk/release/app-release.apk
+        file: app/release/app-release.apk
