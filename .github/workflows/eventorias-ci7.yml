@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ main ] # or whatever your primary branch is named
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Make gradlew executable
+      run: chmod +x gradlew
+
+    - name: Run Unit Tests
+      run: ./gradlew test
+
+    - name: Install Android SDK Components
+      run: |
+        yes | sdkmanager --licenses
+        sdkmanager --install "system-images;android-30;google_apis;x86_64"
+
+    - name: Start Emulator and Run Instrumented Tests
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 30
+        target: "google_apis"
+        arch: "x86_64"
+        avd-name: "Pixel_6_Pro_API_30"
+        script: ./gradlew connectedDebugAndroidTest
+        emulator-options: "-no-boot-anim -no-window"
+        emulator-boot-timeout: 600 # 10 minutes timeout for emulator boot
+        force-avd-creation: true # Force creation of AVD if needed
+      timeout-minutes: 30 # Adjust based on your test duration
+
+    - name: Build and Analyze with SonarCloud
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        ./gradlew sonar \
+        -Dsonar.projectKey=your-project-key \
+        -Dsonar.organization=your-organization-key \
+        -Dsonar.host.url=https://sonarcloud.io \
+        -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+    - name: Check Quality Gate
+      uses: sonarsource/sonarqube-quality-gate-action@master
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      timeout-minutes: 5
