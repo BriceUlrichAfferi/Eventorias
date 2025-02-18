@@ -38,7 +38,6 @@ fun SignUpScreen(
     val currentStep = rememberSaveable { mutableStateOf(1) }
     val password = rememberSaveable { mutableStateOf("") }
     val passwordError = rememberSaveable { mutableStateOf<String?>(null) }
-    val auth = FirebaseAuth.getInstance()
 
     val scrollState = rememberScrollState()
 
