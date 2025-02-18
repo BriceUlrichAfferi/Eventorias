@@ -22,16 +22,24 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
-
+    signingConfigs {
+        // New signing config for the new keystore
+       create("release")  {
+            storeFile = file("C:/Users/commu/Desktop/OC/PROJET 16/new_keystore.jks")
+            storePassword = "jesusmarie1"
+            keyAlias = "new_keystore"
+            keyPassword = "jesusmarie1"
+        }
+    }
     buildTypes {
         getByName("release") {
             // Enables code shrinking, obfuscation, and optimization for only
             // release build type.
-            isMinifyEnabled = true
+            isMinifyEnabled = false
 
             // Enables resource shrinking, performed by the
             // Android Gradle plugin.
-            isShrinkResources = true
+            isShrinkResources = false
 
             proguardFiles(
                 // R8 configuration files.
@@ -100,7 +108,6 @@ sonarqube {
         property("sonar.projectKey", "com.example.eventorias")
         property("sonar.organization", "briceulrichafferi")
         property("sonar.host.url", "https://sonarcloud.io")
-        // Add more properties as needed for your SonarQube configuration
     }
 }
 
