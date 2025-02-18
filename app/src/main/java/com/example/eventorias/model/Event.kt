@@ -1,9 +1,7 @@
 package com.example.eventorias.model
 
-import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
-import java.text.SimpleDateFormat
 import java.util.Date
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalTime
@@ -32,14 +30,14 @@ data class Event(
                 title = map["title"] as String? ?: "",  // Direct casting for fields that are Strings
                 description = map["description"] as String? ?: "",
                 date = try {
-                    (map["date"] as? String)?.let {
+                    (map["date"] as String?)?.let {
                         LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE)
                     } ?: LocalDate.now()
                 } catch (e: DateTimeParseException) {
                     LocalDate.now()
                 },
                 time = try {
-                    (map["time"] as? String)?.let {
+                    (map["time"] as String?)?.let {
                         LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME)
                     } ?: LocalTime.now()
                 } catch (e: DateTimeParseException) {

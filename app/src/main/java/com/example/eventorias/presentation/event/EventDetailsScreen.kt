@@ -248,7 +248,7 @@ fun EventDescription(event: Event) {
         horizontalAlignment = Alignment.Start
     ) {
         Text(
-            text = event.description ?: stringResource(id = R.string.no_description),
+            text = event.description,
             color = Color.White,
             textAlign = TextAlign.Justify
         )

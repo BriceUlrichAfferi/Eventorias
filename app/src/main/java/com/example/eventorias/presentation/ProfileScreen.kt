@@ -40,7 +40,7 @@ import org.koin.androidx.compose.koinViewModel
 fun ProfileScreen(
     onSignOut: () -> Unit,
     userdata: Userdata?,
-    googleAuthUiClient: GoogleAuthUiClient,
+
     viewModel: NotificationViewModel = koinViewModel()
 ) {
     val context = LocalContext.current

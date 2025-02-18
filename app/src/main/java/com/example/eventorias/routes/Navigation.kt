@@ -94,7 +94,6 @@ fun NavGraphBuilder.appNavigation(
 
         ProfileScreen(
             userdata = googleAuthUiClient.getSignedInUser() ?: emailAuthClient.getSignedInUser(),
-            googleAuthUiClient = googleAuthUiClient,
             onSignOut = {
                 lifecycleScope.launch {
                     googleAuthUiClient.signOut()
