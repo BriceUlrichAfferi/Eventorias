@@ -24,16 +24,23 @@ jobs:
     - name: Run Unit Tests
       run: ./gradlew test
 
+    - name: Install Android SDK Components
+      run: |
+        yes | sdkmanager --licenses
+        sdkmanager --install "system-images;android-30;google_apis;x86_64"
+
     - name: Start Emulator and Run Instrumented Tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 30
         target: "google_apis"
         arch: "x86_64"
-        avd-name: "test_emulator"
-        script: ./gradlew connectedAndroidTest
-        emulator-options: "-no-boot-anim -no-window" # For faster startup
-      timeout-minutes: 20 # Adjust based on your test duration
+        avd-name: "Pixel_6_Pro_API_30"
+        script: ./gradlew connectedDebugAndroidTest
+        emulator-options: "-no-boot-anim -no-window"
+        emulator-boot-timeout: 600 # 10 minutes timeout for emulator boot
+        force-avd-creation: true # Force creation of AVD if needed
+      timeout-minutes: 30 # Adjust based on your test duration
 
     - name: Build and Analyze with SonarCloud
       env:
