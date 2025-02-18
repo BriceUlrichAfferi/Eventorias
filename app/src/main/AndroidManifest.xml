@@ -14,6 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Eventorias"
+        android:usesCleartextTraffic="false"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
@@ -30,7 +32,8 @@
         <!-- Notification Service -->
         <service
             android:name=".presentation.notification.NotificationsService"
-            android:exported="true">
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>

@@ -59,7 +59,6 @@ fun ProfileScreen(
                     val profilePictureUrl = document.getString("profilePictureUrl") ?: ""
                     val photoUrl = document.getString("photoUrl") ?: ""
 
-                    val googleUser = googleAuthUiClient.getSignedInUser()
                     val email = FirebaseAuth.getInstance().currentUser?.email ?: "No Email"
 
                     userDataState.value = Userdata(

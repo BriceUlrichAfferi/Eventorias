@@ -29,8 +29,8 @@ data class Event(
             val map = document.data ?: return null
             return Event(
                 id = document.id,
-                title = map["title"] as? String ?: "",
-                description = map["description"] as? String ?: "",
+                title = map["title"] as String? ?: "",  // Direct casting for fields that are Strings
+                description = map["description"] as String? ?: "",
                 date = try {
                     (map["date"] as? String)?.let {
                         LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE)
@@ -45,28 +45,18 @@ data class Event(
                 } catch (e: DateTimeParseException) {
                     LocalTime.now()
                 },
-                location = map["location"] as? String ?: "",
+                location = map["location"] as String? ?: "",
                 createdAt = when (val createdAt = map["createdAt"]) {
-                    is Timestamp -> createdAt.toDate()
+                    is Timestamp -> createdAt.toDate()  // Direct handling for Timestamp and Date
                     is Date -> createdAt
-                    is String -> {
-                        try {
-                            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(createdAt)
-                        } catch (e: Exception) {
-                            Log.e("Event", "Error parsing createdAt: $createdAt", e)
-                            Date()
-                        }
-                    }
-                    else -> {
-                        Date()
-                    }
+                    else -> Date()  // Default to current Date if not a valid type
                 },
-                category = map["category"] as? String ?: "",
-                photoUrl = map["photoUrl"] as? String,
-                userProfileUrl = map["userProfileUrl"] as? String
-            ).also {
-            }
+                category = map["category"] as String? ?: "",
+                photoUrl = map["photoUrl"] as String?,
+                userProfileUrl = map["userProfileUrl"] as String?
+            )
         }
+
 
         // Store to Firestore
         fun toFirestore(event: Event): Map<String, Any> {

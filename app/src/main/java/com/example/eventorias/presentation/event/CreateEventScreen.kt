@@ -181,9 +181,9 @@ fun CreateEventScreen(
                             .clickable {
                                 // Show DatePickerDialog
                                 val calendar = Calendar.getInstance()
-                                val year = calendar.get(Calendar.YEAR)
-                                val month = calendar.get(Calendar.MONTH)
-                                val day = calendar.get(Calendar.DAY_OF_MONTH)
+                                val year = calendar[Calendar.YEAR]
+                                val month = calendar[Calendar.MONTH]
+                                val day = calendar[Calendar.DAY_OF_MONTH]
 
                                 DatePickerDialog(
                                     context,
@@ -215,8 +215,8 @@ fun CreateEventScreen(
                             .clickable{
                                 // Show TimePickerDialog
                                 val calendar = Calendar.getInstance()
-                                val hour = calendar.get(Calendar.HOUR_OF_DAY)
-                                val minute = calendar.get(Calendar.MINUTE)
+                                val hour = calendar[Calendar.HOUR_OF_DAY]
+                                val minute = calendar[Calendar.MINUTE]
 
                                 TimePickerDialog(
                                     context,
@@ -434,7 +434,7 @@ fun saveEventToFirestore(
         // Upload the image to Firebase Storage
         val storageRef = storage.reference.child("events/$eventId.jpg")
         storageRef.putFile(imageUri)
-            .addOnSuccessListener { taskSnapshot ->
+            .addOnSuccessListener {  _ ->  // Replaced taskSnapshot with "_"
                 storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
                     eventData["photoUrl"] = downloadUri.toString()
                     eventData["userProfileUrl"] = userProfileUrl ?: ""

@@ -47,8 +47,8 @@ fun SignUpScreen(
             if (currentStep.value > 0) {
                 val title = when (currentStep.value) {
                     1 -> R.string.sign_up
-                    2 -> R.string.sign_up
-                    else -> R.string.sign_up
+                    2 -> R.string.sign_up2
+                    else -> R.string.sign_up3
                 }
                 TopAppBar(
                     title = { Text(text = stringResource(id = title), color = Color.White) },

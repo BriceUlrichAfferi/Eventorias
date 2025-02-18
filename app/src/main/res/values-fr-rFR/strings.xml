@@ -19,6 +19,8 @@
     <string name="bottom_navigation_events">Événements</string>
     <string name="bottom_navigation_profile">Profile</string>
     <string name="sign_up">S\'inscrire</string>
+    <string name="sign_up2">S\'inscrire</string>
+    <string name="sign_up3">S\'inscrire</string>
     <string name="sign_in_email">Connectez-vous avec votre e-mail</string>
 
     <string name="sign_in">Se connecter</string>

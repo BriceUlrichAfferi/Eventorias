@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.eventorias.presentation.event
 
 import android.content.Context
@@ -62,110 +64,11 @@ fun EventListScreen(
     var isSearchExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            stringResource(id = R.string.event_list),
-                            color = Color.White
-                        )
-
-                        if (isSearchExpanded) {
-                            TextField(
-                                value = searchQuery,
-                                onValueChange = { searchQuery = it },
-                                placeholder = { Text("Search events (ex:'2023-05-01' for date)", color = Color.White) },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(start = 16.dp),
-                                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-                                keyboardActions = KeyboardActions(
-                                    onSearch = {
-                                        Toast.makeText(context, "Searching for $searchQuery", Toast.LENGTH_SHORT).show()
-                                    }
-                                ),
-                                trailingIcon = {
-                                    IconButton(onClick = { isSearchExpanded = false }) {
-                                        Icon(Icons.Default.Close, "Close")
-                                    }
-                                },
-                                colors = TextFieldDefaults.colors(
-                                    focusedTextColor = Color.White,
-                                    unfocusedTextColor = Color.White,
-                                    disabledTextColor = Color.Gray,
-                                    focusedIndicatorColor = Color.White,
-                                    unfocusedIndicatorColor = Color.White,
-                                    focusedLabelColor = Color.White,
-                                    unfocusedLabelColor = Color.White,
-                                    focusedContainerColor = colorResource(id = R.color.grey_pro),
-                                    unfocusedContainerColor = colorResource(id = R.color.grey_pro),
-                                    disabledContainerColor = Color.LightGray,
-                                ),
-                                singleLine = true
-                            )
-                        } else {
-                            IconButton(onClick = { isSearchExpanded = true }) {
-                                Icon(Icons.Filled.Search, "Expand Search", tint = Color.White)
-                            }
-                        }
-                    }
-                },
-                actions = {
-                    var expanded by remember { mutableStateOf(false) }
-                    Box(modifier = Modifier.wrapContentSize(Alignment.TopEnd)) {
-                        IconButton(onClick = { expanded = true }) {
-                            Icon(
-                                Icons.Default.SwapVert,
-                                contentDescription = "Sort",
-                                tint = Color.White
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Sort by Date") },
-                                onClick = {
-                                    sortOption = "date"
-                                    expanded = false
-                                    eventViewModel.fetchEventsBySortOption(sortOption)
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Sort by Category") },
-                                onClick = {
-                                    sortOption = "category"
-                                    expanded = false
-                                    eventViewModel.fetchEventsBySortOption(sortOption)
-                                }
-                            )
-                        }
-                    }
-                }
-            )
-        },
+        topBar = { EventListTopAppBar(isSearchExpanded, searchQuery, onSearchQueryChange = { searchQuery = it }, context, onSearchExpandedChange = { isSearchExpanded = it }, eventViewModel, sortOption, onSortOptionChange = { sortOption = it }) },
         modifier = modifier,
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
-            if (errorMessage == null && events.isNotEmpty()) { // Hide FAB when error is present
-                FloatingActionButton(
-                    onClick = onFABClick,
-                    modifier = Modifier,
-                    containerColor = Color.Red
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = stringResource(id = R.string.description_button_add),
-                        tint = Color.White
-                    )
-                }
-            }
+            FloatingActionButtonSection(events, errorMessage, onFABClick)
         }
     ) { paddingValues ->
         Box(
@@ -184,18 +87,7 @@ fun EventListScreen(
 
                 else -> {
                     LazyColumn {
-                        items(events.filter { event ->
-                            // Check if search query matches title, description, category, or date
-                            val datePattern = Regex("^\\d{4}-\\d{2}-\\d{2}$")
-                            if (datePattern.matches(searchQuery)) {
-                                val queryDate = LocalDate.parse(searchQuery)
-                                event.date == queryDate
-                            } else {
-                                event.title.contains(searchQuery, ignoreCase = true) ||
-                                        event.description.contains(searchQuery, ignoreCase = true) ||
-                                        event.category.contains(searchQuery, ignoreCase = true)
-                            }
-                        }) { event ->
+                        items(filteredEvents(events, searchQuery)) { event ->
                             Log.d("EventListScreen", "Displaying event: ${event.title}, Date: ${event.date}, CreatedAt: ${event.createdAt}")
                             EventItem(
                                 event = event,
@@ -206,6 +98,146 @@ fun EventListScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun EventListTopAppBar(
+    isSearchExpanded: Boolean,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    context: Context,
+    onSearchExpandedChange: (Boolean) -> Unit,
+    eventViewModel: EventViewModel,
+    sortOption: String,
+    onSortOptionChange: (String) -> Unit
+) {
+    TopAppBar(
+        title = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(stringResource(id = R.string.event_list), color = Color.White)
+                SearchField(isSearchExpanded, searchQuery, onSearchQueryChange, context, onSearchExpandedChange)
+            }
+        },
+        actions = {
+            SortDropdownMenu(eventViewModel, sortOption, onSortOptionChange)
+        }
+    )
+}
+
+@Composable
+fun SearchField(
+    isSearchExpanded: Boolean,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    context: Context,
+    onSearchExpandedChange: (Boolean) -> Unit
+) {
+    if (isSearchExpanded) {
+        TextField(
+            value = searchQuery,
+            onValueChange = onSearchQueryChange,
+            placeholder = { Text("Search events (ex:'2023-05-01' for date)", color = Color.White) },
+            modifier = Modifier
+                // Correct usage of weight inside Row
+                .padding(start = 16.dp),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(
+                onSearch = {
+                    Toast.makeText(context, "Searching for $searchQuery", Toast.LENGTH_SHORT).show()
+                }
+            ),
+            trailingIcon = {
+                IconButton(onClick = { onSearchExpandedChange(false) }) {
+                    Icon(Icons.Default.Close, "Close")
+                }
+            },
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                focusedIndicatorColor = Color.White,
+                unfocusedIndicatorColor = Color.White,
+                focusedLabelColor = Color.White,
+                unfocusedLabelColor = Color.White,
+                focusedContainerColor = colorResource(id = R.color.grey_pro),
+                unfocusedContainerColor = colorResource(id = R.color.grey_pro)
+            ),
+            singleLine = true
+        )
+    } else {
+        IconButton(onClick = { onSearchExpandedChange(true) }) {
+            Icon(Icons.Filled.Search, "Expand Search", tint = Color.White)
+        }
+    }
+}
+
+@Composable
+fun SortDropdownMenu(eventViewModel: EventViewModel, sortOption: String, onSortOptionChange: (String) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    Box(modifier = Modifier.wrapContentSize(Alignment.TopEnd)) {
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                Icons.Default.SwapVert,
+                contentDescription = "Sort",
+                tint = Color.White
+            )
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Sort by Date") },
+                onClick = {
+                    onSortOptionChange("date")
+                    expanded = false
+                    eventViewModel.fetchEventsBySortOption("date")
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Sort by Category") },
+                onClick = {
+                    onSortOptionChange("category")
+                    expanded = false
+                    eventViewModel.fetchEventsBySortOption("category")
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun FloatingActionButtonSection(events: List<Event>, errorMessage: String?, onFABClick: () -> Unit) {
+    if (errorMessage == null && events.isNotEmpty()) {
+        FloatingActionButton(
+            onClick = onFABClick,
+            modifier = Modifier,
+            containerColor = Color.Red
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = stringResource(id = R.string.description_button_add),
+                tint = Color.White
+            )
+        }
+    }
+}
+
+fun filteredEvents(events: List<Event>, searchQuery: String): List<Event> {
+    val datePattern = Regex("^\\d{4}-\\d{2}-\\d{2}$")
+    return events.filter { event ->
+        if (datePattern.matches(searchQuery)) {
+            val queryDate = LocalDate.parse(searchQuery)
+            event.date == queryDate
+        } else {
+            event.title.contains(searchQuery, ignoreCase = true) ||
+                    event.description.contains(searchQuery, ignoreCase = true) ||
+                    event.category.contains(searchQuery, ignoreCase = true)
         }
     }
 }

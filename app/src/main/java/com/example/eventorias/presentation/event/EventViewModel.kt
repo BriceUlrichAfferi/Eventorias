@@ -8,10 +8,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.time.LocalDate
-import java.time.LocalTime
-import java.util.Date
-
 class EventViewModel : ViewModel(), KoinComponent {
 
     private val repository: EventRepository by inject()
