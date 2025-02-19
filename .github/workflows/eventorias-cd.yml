@@ -1,3 +1,5 @@
+name: Firebase Distribution
+
 on:
   push:
     branches:
