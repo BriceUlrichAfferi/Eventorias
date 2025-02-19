@@ -1,5 +1,3 @@
-name: Firebase Distribution
-
 on:
   push:
     branches:
@@ -28,11 +26,12 @@ jobs:
       - name: Verify APK Path
         run: ls -la app/release
 
-      # Write Firebase credentials to a file
-      - name: Write Firebase credentials to file
+      # Debugging Firebase credentials to check if the secret is set correctly
+      - name: Debugging Firebase credentials
         run: echo "${{ secrets.FIREBASE_CREDENTIALS }}" > eventoriassignin-firebase-adminsdk-fbsvc-a7aa5e2e07.json
+        shell: bash
 
-      # Check the Firebase credentials file to confirm it's written
+      # Check if the Firebase credentials file was written correctly
       - name: Check Firebase credentials file
         run: cat eventoriassignin-firebase-adminsdk-fbsvc-a7aa5e2e07.json
 
