@@ -22,7 +22,7 @@ jobs:
       - name: Upload to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
         with:
-          appId: ${{ secrets.FIREBASE_APP_ID }}
+          appId: 'eventoriassignin'
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
           groups: testers # Change this to your group name in Firebase
           file: app/release/app-release.apk
