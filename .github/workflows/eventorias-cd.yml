@@ -19,6 +19,8 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Ensure gradlew is executable
+        run: chmod +x ./gradlew
       - name: Build APK
         run: ./gradlew assembleRelease
 
