@@ -28,9 +28,13 @@ jobs:
       - name: Verify APK Path
         run: ls -la app/release
 
-      # Step to write Firebase credentials to a file
+      # Write Firebase credentials to a file
       - name: Write Firebase credentials to file
         run: echo "${{ secrets.FIREBASE_CREDENTIALS }}" > serviceAccountKey.json
+
+      # Debug credentials file (optional, remove after testing)
+      - name: Debug Firebase credentials file
+        run: cat serviceAccountKey.json
 
       # Upload the APK to Firebase App Distribution
       - name: Upload to Firebase App Distribution
@@ -38,6 +42,8 @@ jobs:
         with:
           appId: ${{ secrets.APP_ID }}
           serviceCredentialsFile: serviceAccountKey.json
+
+
           groups: "testers"
           file: "app/release/app-release.apk"
           releaseNotes: "Automated release from GitHub Actions"
