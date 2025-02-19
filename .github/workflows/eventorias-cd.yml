@@ -30,7 +30,7 @@ jobs:
 
       # Write Firebase credentials to a file
       - name: Write Firebase credentials to file
-        run: echo "${{ secrets.FIREBASE_CREDENTIALS }}" > serviceAccountKey.json
+        run: echo "${{ secrets.FIREBASE_CREDENTIALS }}" > eventoriassignin-firebase-adminsdk-fbsvc-a7aa5e2e07.json
 
       # Check the Firebase credentials file to confirm it's written
       - name: Check Firebase credentials file
@@ -40,8 +40,8 @@ jobs:
       - name: Upload to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
         with:
-          appId: ${{ secrets.APP_ID }}
-          serviceCredentialsFile: serviceAccountKey.json
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFile: eventoriassignin-firebase-adminsdk-fbsvc-a7aa5e2e07.json
           groups: "testers"
           file: "app/release/app-release.apk"
           releaseNotes: "Automated release from GitHub Actions"
