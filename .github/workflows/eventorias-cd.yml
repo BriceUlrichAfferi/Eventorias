@@ -39,10 +39,10 @@ jobs:
 
       # Upload the APK to Firebase App Distribution
       - name: Upload to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_APP_ID }}
-          serviceCredentialsFile: eventoriassignin-firebase-adminsdk-fbsvc-685e429f94.json
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIALS }}
           groups: "testers"
           file: "app/release/app-release.apk"
           releaseNotes: "Automated release from GitHub Actions"
