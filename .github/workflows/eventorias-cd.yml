@@ -21,17 +21,23 @@ jobs:
 
       - name: Ensure gradlew is executable
         run: chmod +x ./gradlew
+
       - name: Build APK
         run: ./gradlew assembleRelease
 
       - name: Verify APK Path
         run: ls -la app/release
 
+      # Step to write Firebase credentials to a file
+      - name: Write Firebase credentials to file
+        run: echo "${{ secrets.FIREBASE_CREDENTIALS }}" > serviceAccountKey.json
+
+      # Upload the APK to Firebase App Distribution
       - name: Upload to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
         with:
           appId: ${{ secrets.APP_ID }}
-          serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIALS }}
+          serviceCredentialsFile: serviceAccountKey.json
           groups: "testers"
           file: "app/release/app-release.apk"
           releaseNotes: "Automated release from GitHub Actions"
