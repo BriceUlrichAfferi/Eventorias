@@ -30,19 +30,19 @@ jobs:
 
       # Debugging Firebase credentials to check if the secret is set correctly
       - name: Debugging Firebase credentials
-        run: echo "${{ secrets.FIREBASE_CREDENTIALS }}" > eventoriassignin-firebase-adminsdk-fbsvc-a7aa5e2e07.json
+        run: echo "${{ secrets.FIREBASE_CREDENTIALS }}" > eventoriassignin-firebase-adminsdk-fbsvc-685e429f94.json
         shell: bash
 
       # Check if the Firebase credentials file was written correctly
       - name: Check Firebase credentials file
-        run: cat eventoriassignin-firebase-adminsdk-fbsvc-a7aa5e2e07.json
+        run: cat eventoriassignin-firebase-adminsdk-fbsvc-685e429f94.json
 
       # Upload the APK to Firebase App Distribution
       - name: Upload to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
         with:
           appId: ${{ secrets.FIREBASE_APP_ID }}
-          serviceCredentialsFile: eventoriassignin-firebase-adminsdk-fbsvc-a7aa5e2e07.json
+          serviceCredentialsFile: eventoriassignin-firebase-adminsdk-fbsvc-685e429f94.json
           groups: "testers"
           file: "app/release/app-release.apk"
           releaseNotes: "Automated release from GitHub Actions"
