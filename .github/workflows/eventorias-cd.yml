@@ -34,7 +34,7 @@ jobs:
 
       # Check the Firebase credentials file to confirm it's written
       - name: Check Firebase credentials file
-        run: cat serviceAccountKey.json
+        run: cat eventoriassignin-firebase-adminsdk-fbsvc-a7aa5e2e07.json
 
       # Upload the APK to Firebase App Distribution
       - name: Upload to Firebase App Distribution
