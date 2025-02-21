@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
     branches: [ main ] # or whatever your primary branch is named
-
+##tache a accomplir
 jobs:
   build:
     runs-on: ubuntu-latest
