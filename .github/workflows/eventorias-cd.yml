@@ -44,6 +44,6 @@ jobs:
           appId: ${{ secrets.FIREBASE_APP_ID }}
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIALS }}
           groups: "testers"
-          file: "app/release/app-release.apk"
+          file: "app-release-signed.apk"
           releaseNotes: "Automated release from GitHub Actions"
           debug: true

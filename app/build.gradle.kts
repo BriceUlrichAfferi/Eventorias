@@ -17,7 +17,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 2
-        versionName = "1.1.0"
+        versionName = "2.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -27,34 +27,20 @@ android {
        create("release")  {
             storeFile = file("new_keystore.jks")
             storePassword = "jesusmarie1"
-            keyAlias = "new_keystore"
+            keyAlias = "new_key"
             keyPassword = "jesusmarie1"
         }
     }
     buildTypes {
         getByName("release") {
-            // Enables code shrinking, obfuscation, and optimization for only
-            // release build type.
             isMinifyEnabled = false
-
-            // Enables resource shrinking, performed by the
-            // Android Gradle plugin.
             isShrinkResources = false
-
             proguardFiles(
-                // R8 configuration files.
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-
-                // local, custom Proguard rules file
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release") // Ensure this is set
         }
-
-        debug {
-            enableAndroidTestCoverage = true
-            enableUnitTestCoverage = true
-        }
-
     }
 
     compileOptions {
